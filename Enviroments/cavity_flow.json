@@ -1,0 +1,52 @@
+{
+  "nx": 41,
+  "ny": 41,
+  "nt": 3000,
+  "nu": 0.1,
+  "rho": 1.0,
+  "f": [
+    0.0,
+    0.0
+  ],
+  "dt": 0.001,
+  "bc_n": {
+    "u": {
+      "Dirichlet": 1.0
+    },
+    "v": {
+      "Dirichlet": 0.0
+    },
+    "p": {
+      "Dirichlet": 0.0
+    }
+  },
+  "bc_w": {
+    "u": {
+      "Dirichlet": 0.0
+    },
+    "v": {
+      "Dirichlet": 0.0
+    },
+    "p": {"Neumann":0.0}
+  },
+  "bc_s": {
+    "u": {
+      "Dirichlet": 0.0
+    },
+    "v": {
+      "Dirichlet": 0.0
+    },
+    "p": {
+      "Neumann": 0.0
+    }
+  },
+  "bc_e": {
+    "u": {
+      "Dirichlet": 0.0
+    },
+    "v": {
+      "Dirichlet": 0.0
+    },
+    "p": {"Neumann":0.0}
+  }
+}

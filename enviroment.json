@@ -1,0 +1,44 @@
+{
+  "nx": 41,
+  "ny": 41,
+  "nt": 5000,
+  "nu": 0.1,
+  "rho": 1.0,
+  "f": [
+    1.0,
+    0.0
+  ],
+  "dt": 0.01,
+  "BC_N": {
+    "u": {
+      "Dirichlet": "0.0"
+    },
+    "v": {
+      "Dirichlet": "0.0"
+    },
+    "p": {
+      "Neumann": "0.0"
+    }
+  },
+  "BC_W": {
+    "u": "Periodic",
+    "v": "Periodic",
+    "p": "Periodic"
+  },
+  "BC_S": {
+    "u": {
+      "Dirichlet": "0.0"
+    },
+    "v": {
+      "Dirichlet": "0.0"
+    },
+    "p": {
+      "Neumann": "0.0"
+    }
+  },
+  "BC_E": {
+    "u": "Periodic",
+    "v": "Periodic",
+    "p": "Periodic"
+  }
+}
