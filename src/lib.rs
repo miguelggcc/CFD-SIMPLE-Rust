@@ -20,6 +20,7 @@ impl Env {
 pub struct Plot<'p> {
     py: Python<'p>,
     plt: PyModule,
+    np: PyModule,
     writer: PyObject,
     artists: Vec<PyObject>,
 }
@@ -28,6 +29,7 @@ impl<'p> Plot<'p> {
     pub fn new<'a>(env: &'a Env, fps: u32) -> Plot<'a> {
         let py = env.gil.python();
         let plt = PyModule::import(py, "matplotlib.pyplot").unwrap();
+        let np = PyModule::import(py, "numpy").unwrap();
         let animation = PyModule::import(py, "matplotlib.animation").unwrap();
         let dict = PyDict::new(py);
         dict.set_item(py, "fps", fps).unwrap();
@@ -40,6 +42,7 @@ impl<'p> Plot<'p> {
         Plot {
             py,
             plt,
+            np,
             writer,
             artists,
         }
@@ -98,8 +101,8 @@ impl<'p> Plot<'p> {
         dict.set_item(self.py, "cmap", cmap).unwrap();
         dict.set_item(self.py, "animated", "True").unwrap();
 
-        dict.set_item(self.py, "vmin", -3).unwrap();
-        dict.set_item(self.py, "vmax", 3).unwrap();
+        dict.set_item(self.py, "vmin", 0.0).unwrap();
+        dict.set_item(self.py, "vmax", 2.0).unwrap();
 
         let c = ax
             .call_method(
@@ -128,21 +131,15 @@ impl<'p> Plot<'p> {
     }
 
     pub fn quiver(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32]) {
-        let nx = x.len();
-        let ny = y.len();
-
-        let x2: Vec<f32> = x.iter().step_by(2).copied().collect();
-        let y2: Vec<f32> = y.iter().step_by(2).copied().collect();
-
-        let np_u = self.reshape(&reduce_in_half(u, nx, ny), 21, 21);
-        let np_v = self.reshape(&reduce_in_half(v, nx, ny), 21, 21);
+        let np_u = self.reshape(u, 41, 41);
+        let np_v = self.reshape(v, 41, 41);
 
         let dictq = PyDict::new(self.py);
-        dictq.set_item(self.py, "scale", 1 * nx / 15).unwrap();
+        dictq.set_item(self.py, "scale", 1 * x.len() / 30).unwrap();
 
         let q = self
             .plt
-            .call(self.py, "quiver", (x2, y2, np_u, np_v), Some(&dictq))
+            .call(self.py, "quiver", (x, y, np_u, np_v), Some(&dictq))
             .unwrap();
 
         self.artists.push(q);
@@ -155,10 +152,10 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn udate_frame(&self, z: &[f32], u: &[f32], v: &[f32]) {
+    pub fn update_frame(&self, z: &[f32], u: &[f32], v: &[f32]) {
         let np_z = self.reshape(z, 41, 41);
-        let np_u = self.reshape(&reduce_in_half(u, 41, 41), 21, 21);
-        let np_v = self.reshape(&reduce_in_half(v, 41, 41), 21, 21);
+        let np_u = self.reshape(u, 41, 41);
+        let np_v = self.reshape(v, 41, 41);
         self.artists[0]
             .call_method(self.py, "set_data", (&np_z,), None)
             .unwrap();
@@ -208,12 +205,13 @@ impl<'p> Plot<'p> {
     }
 
     pub fn reshape(&self, values: &[f32], a: usize, b: usize) -> PyObject {
-        let np = PyModule::import(self.py, "numpy").unwrap();
-        np.call(self.py, "reshape", (values, (a, b)), None).unwrap()
+        self.np
+            .call(self.py, "reshape", (values, (a, b)), None)
+            .unwrap()
     }
 }
 
-pub fn reduce_in_half(vec: &[f32], nx: usize, ny: usize) -> Vec<f32> {
+/*pub fn reduce_in_half(vec: &[f32], nx: usize, ny: usize) -> Vec<f32> {
     let nx2 = (nx as f32 / 2.0).ceil() as usize;
     let ny2 = (ny as f32 / 2.0).ceil() as usize;
 
@@ -224,4 +222,4 @@ pub fn reduce_in_half(vec: &[f32], nx: usize, ny: usize) -> Vec<f32> {
         }
     }
     vec2
-}
+}*/

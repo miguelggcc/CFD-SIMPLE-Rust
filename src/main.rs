@@ -1,11 +1,10 @@
-mod physics;
+mod maths;
+pub mod physics;
 
 use std::{fs, time::Instant};
 
-use physics::Physics;
+use crate::physics::{Enviroment, Physics};
 use CFDplotlib::{Env, Plot};
-
-use crate::physics::Enviroment;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let now = Instant::now();
@@ -21,18 +20,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         serde_json::from_str(&enviroment_data).expect("JSON does not have correct format.");
 
     let mut physics = Physics::new(enviroment);
-    physics.initialize();
 
     let mut last_var;
     let mut iter = 0;
     let mut var = 0.0;
     let mut error = f32::INFINITY;
 
-    plot.pcolormesh(&physics.x, &physics.y, &physics.p, "viridis", title);
+    plot.pcolormesh(&physics.x, &physics.y, &physics.u, "viridis", title);
     plot.quiver(&physics.x, &physics.y, &physics.u, &physics.v);
     plot.setup_animation();
+    plot.update_frame(&physics.u, &physics.u, &physics.v);
 
-    while iter < physics.nt && error.abs() > 1e-3 {
+
+    while iter < 500 && error.abs() > -1e-3 {
         physics.iterate();
 
         last_var = var;
@@ -43,10 +43,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             error = var - last_var;
         }
 
-        plot.udate_frame(&physics.p,&physics.u, &physics.v);
+        plot.update_frame(&physics.u, &physics.u, &physics.v);
 
         iter += 1;
-        dbg!(iter);
+        dbg!(iter, error.abs());
     }
 
     plot.finish_animation();
