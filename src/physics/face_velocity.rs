@@ -22,8 +22,7 @@ impl Physics {
             0.5 * (vel[ix(i, j, n)] + vel[ix(i_other, j_other, n)])
                 + 0.5
                     * (dpdx_0 / a_0[ix(i, j, n)] + dpdx_other / a_0[ix(i_other, j_other, n)]
-                        - (1.0 / a_0[ix(i, j, n)] + 1.0 / a_0[ix(i_other, j_other, n)])
-                            * dpdx_face)
+                        - (1.0 / a_0[ix(i, j, n)] + 1.0 / a_0[ix(i_other, j_other, n)]) * dpdx_face)
                     * d
         }
 
@@ -72,7 +71,7 @@ impl Physics {
 
         //-------------------------------Left wall---------------------------------------------------
         let i = 1;
-        for j in 0..self.ny {
+        for j in 1..self.ny - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdx_0 = 0.5 * (self.p[ix(i + 1, j, n)] - self.p[ix(i - 1, j, n)]);
@@ -111,7 +110,7 @@ impl Physics {
         }
 
         let i = 0;
-        for j in 0..self.ny {
+        for j in 1..self.ny - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdx_0 = 0.5 * (self.p[ix(i + 1, j, n)] - self.p[ix(i, j, n)]);
@@ -137,7 +136,7 @@ impl Physics {
 
         //-------------------------------Right wall---------------------------------------------------
         let i = self.nx - 2;
-        for j in 0..self.ny {
+        for j in 1..self.ny - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdx_0 = 0.5 * (self.p[ix(i + 1, j, n)] - self.p[ix(i - 1, j, n)]);
@@ -176,7 +175,7 @@ impl Physics {
         }
 
         let i = self.nx - 1;
-        for j in 0..self.ny {
+        for j in 1..self.ny - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdx_0 = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i - 1, j, n)]);
@@ -216,13 +215,13 @@ impl Physics {
 
         f.u_e = 1.0;
 
-        f.u_w = 0.0;
+        f.u_w = 1.0;
 
         let j = self.ny - 1;
         let i = self.nx - 1;
         let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
-        f.u_e = 0.0;
+        f.u_e = 1.0;
 
         f.u_w = 1.0;
 
@@ -240,7 +239,7 @@ impl Physics {
 
         //-------------------------------inner cells---------------------------------------------------
         for j in 2..self.ny - 2 {
-            for i in 1..self.nx-1 {
+            for i in 1..self.nx - 1 {
                 let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
                 let dpdy_0 = 0.5 * (self.p[ix(i, j + 1, n)] - self.p[ix(i, j - 1, n)]);
@@ -281,7 +280,7 @@ impl Physics {
 
         //-------------------------------Top wall---------------------------------------------------
         let j = self.ny - 2;
-        for i in 1..self.nx-1 {
+        for i in 1..self.nx - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdy_0 = 0.5 * (self.p[ix(i, j + 1, n)] - self.p[ix(i, j - 1, n)]);
@@ -320,7 +319,7 @@ impl Physics {
         }
 
         let j = self.ny - 1;
-        for i in 1..self.nx-1 {
+        for i in 1..self.nx - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdy_0 = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i, j - 1, n)]);
@@ -346,7 +345,7 @@ impl Physics {
 
         //-------------------------------Bottom wall---------------------------------------------------
         let j = 1;
-        for i in 1..self.nx-1 {
+        for i in 1..self.nx - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdy_0 = 0.5 * (self.p[ix(i, j + 1, n)] - self.p[ix(i, j - 1, n)]);
@@ -385,7 +384,7 @@ impl Physics {
         }
 
         let j = 0;
-        for i in 1..self.nx-1 {
+        for i in 1..self.nx - 1 {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdy_0 = 0.5 * (self.p[ix(i, j + 1, n)] - self.p[ix(i, j, n)]);
@@ -420,7 +419,7 @@ impl Physics {
         }
 
         //-------------------------------Right wall---------------------------------------------------
-        let i = self.nx-1;
+        let i = self.nx - 1;
         for j in 0..self.ny {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
@@ -429,6 +428,16 @@ impl Physics {
             f.v_s = 0.0;
         }
 
+        /*let file = File::create("out.txt").unwrap();
+        let mut buffer = io::BufWriter::new(file);
+        for j in 0..self.ny{
+            let mut line = String::new();
+            for i in 0..self.nx{
+                let f = &self.faces[ix(i,j,n)];
+                line.push_str(format!["{} {} ",f.v_n,f.v_s].as_str());
+            }
+            writeln!(buffer, "{}", line).unwrap();
+        }*/
     }
 }
 #[derive(Clone, Default)]

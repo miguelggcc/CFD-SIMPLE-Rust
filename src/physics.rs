@@ -48,13 +48,11 @@ impl Physics {
         let dx = 1.0 / (e.nx as f32);
         let dy = 1.0 / (e.ny as f32);
         let dt = e.dt;
-        let re = e.rho * 1.0 / e.nu;
+        let re = 10.0;
         let x = linspace::<f32>(0.0, 1.0, e.nx).collect();
         let y = linspace::<f32>(0.0, 1.0, e.ny).collect();
         let mut u = vec![0.0; e.nx * e.ny];
-        for i in 0..e.nx{
-            u[ix(i,e.ny-1,e.nx)]=1.0;
-        }
+
         let v = vec![0.0; e.nx * e.ny];
         let p = vec![0.0; e.nx * e.ny];
         let pc = vec![0.0; e.nx * e.ny];
@@ -66,7 +64,7 @@ impl Physics {
         let a_0 = vec![0.0; e.nx * e.ny];
         let a_p0 = a_0.clone();
         let mut faces = vec![Faces::default(); e.ny * e.nx];
-       
+
         Self {
             nx: e.nx,
             ny: e.ny,
@@ -80,7 +78,7 @@ impl Physics {
             re,
             dt,
             relax_uv: 0.8,
-            relax_p: 0.2,
+            relax_p: 0.1,
             x,
             y,
             links,
@@ -101,60 +99,6 @@ impl Physics {
         }
     }
 
-    /*pub fn solve_x_momentum(&mut self) {
-        let n = self.nx;
-        for _ in 0..3 {
-            for j in 1..self.ny - 1 {
-                for i in 1..self.nx - 1 {
-                    let l = &self.links[ix(i, j, n)];
-                    self.u[ix(i, j, n)] = -(l.a_e * self.u[ix(i - 1, j, n)]
-                        + l.a_w * self.u[ix(i + 1, j, n)]
-                        + l.a_n * self.u[ix(i, j + 1, n)]
-                        + l.a_s * self.u[ix(i, j - 1, n)]
-                        - l.s_x)
-                        / self.a_0[ix(i, j, n)];
-                }
-            }
-        }
-    }*/
-
-    /*pub fn solve_y_momentum(&mut self) {
-        let n = self.nx;
-        for _ in 0..3 {
-            for j in 1..self.ny - 1 {
-                for i in 1..self.nx - 1 {
-                    let l = &self.links[ix(i, j, n)];
-                    self.v[ix(i, j, n)] = -(l.a_e * self.v[ix(i + 1, j, n)]
-                        + l.a_w * self.v[ix(i - 1, j, n)]
-                        + l.a_n * self.v[ix(i, j + 1, n)]
-                        + l.a_s * self.v[ix(i, j - 1, n)]
-                        - l.s_y)
-                        / self.a_0[ix(i, j, n)];
-                }
-            }
-        }
-    }*/
-
-    /*pub fn solve_pressure(&mut self) {
-        let n = self.nx;
-        for _ in 0..40 {
-            for j in 1..self.ny - 1 {
-                for i in 1..self.nx - 1 {
-                    let pl = &self.plinks[ix(i, j, n)];
-                    self.pc[ix(i, j, n)] = -(pl.a_e * self.pc[ix(i + 1, j, n)]
-                        + pl.a_w * self.pc[ix(i - 1, j, n)]
-                        + pl.a_n * self.pc[ix(i, j + 1, n)]
-                        + pl.a_s * self.pc[ix(i, j - 1, n)]
-                        - pl.s_x)
-                        / self.a_p0[ix(i, j, n)];
-                    if pl.s_x != 0.0 {
-                        dbg!(pl.s_x);
-                    }
-                }
-            }
-        }
-    }*/
-
     pub fn correct_velocity(&mut self) {
         let n = self.nx;
 
@@ -169,12 +113,12 @@ impl Physics {
 
                 self.u[ix(i, j, n)] += self.relax_uv
                     * 0.5
-                    * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i + 1, j, n)])
+                    * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i + 1, j, n)])
                     * self.dy
                     / a_0;
                 self.v[ix(i, j, n)] += self.relax_uv
                     * 0.5
-                    * (self.pc[ix(i, j - 1, n)] + self.pc[ix(i, j + 1, n)])
+                    * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j + 1, n)])
                     * self.dx
                     / a_0;
 
@@ -201,11 +145,11 @@ impl Physics {
 
             self.u[ix(i, j, n)] += self.relax_uv
                 * 0.5
-                * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i + 1, j, n)])
+                * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i + 1, j, n)])
                 * self.dy
                 / a_0;
             self.v[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i, j, n)] + self.pc[ix(i, j + 1, n)]) * self.dx
+                self.relax_uv * 0.5 * (self.pc[ix(i, j, n)] - self.pc[ix(i, j + 1, n)]) * self.dx
                     / a_0;
 
             let dpcdx_eface = self.pc[ix(i + 1, j, n)] - self.pc[ix(i, j, n)];
@@ -227,11 +171,11 @@ impl Physics {
             let a_0_s = self.a_0[ix(i, j - 1, n)];
 
             self.u[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
+                self.relax_uv * 0.5 * (-self.pc[ix(i + 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
                     / a_0;
             self.v[ix(i, j, n)] += self.relax_uv
                 * 0.5
-                * (self.pc[ix(i, j - 1, n)] + self.pc[ix(i, j + 1, n)])
+                * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j + 1, n)])
                 * self.dx
                 / a_0;
 
@@ -254,11 +198,11 @@ impl Physics {
             let a_0_s = self.a_0[ix(i, j - 1, n)];
 
             self.u[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
+                self.relax_uv * 0.5 * (-self.pc[ix(i - 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
                     / a_0;
             self.v[ix(i, j, n)] += self.relax_uv
                 * 0.5
-                * (self.pc[ix(i, j - 1, n)] + self.pc[ix(i, j + 1, n)])
+                * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j + 1, n)])
                 * self.dx
                 / a_0;
 
@@ -282,11 +226,11 @@ impl Physics {
 
             self.u[ix(i, j, n)] += self.relax_uv
                 * 0.5
-                * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i + 1, j, n)])
+                * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i + 1, j, n)])
                 * self.dy
                 / a_0;
             self.v[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i, j - 1, n)] + self.pc[ix(i, j, n)]) * self.dx
+                self.relax_uv * 0.5 * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j, n)]) * self.dx
                     / a_0;
 
             let dpcdx_eface = self.pc[ix(i + 1, j, n)] - self.pc[ix(i, j, n)];
@@ -307,34 +251,34 @@ impl Physics {
             .zip(&self.pc)
             .for_each(|(p, pc)| *p += self.relax_p * pc);
 
-        //bottom wall
+        /*//bottom wall
         for i in 1..self.nx - 1 {
-            self.p[ix(i, 0, n)] = self.p[ix(i, 1, n)];
+            self.pc[ix(i, 0, n)] = self.pc[ix(i, 1, n)];
         }
 
         //left wall
         for j in 1..self.ny - 1 {
-            self.p[ix(0, j, n)] = self.p[ix(1, j, n)];
+            self.pc[ix(0, j, n)] = self.pc[ix(1, j, n)];
         }
 
         //right wall
         for j in 1..self.ny - 1 {
-            self.p[ix(self.nx - 1, j, n)] = self.p[ix(self.nx - 2, j, n)];
+            self.pc[ix(self.nx - 1, j, n)] = self.pc[ix(self.nx - 2, j, n)];
         }
 
         //top wall
         for i in 1..self.nx - 1 {
-            self.p[ix(i, self.ny - 1, n)] = self.p[ix(i, self.ny - 2, n)];
+            self.pc[ix(i, self.ny - 1, n)] = self.pc[ix(i, self.ny - 2, n)];
         }
 
         //bottom left corner
-        self.p[ix(0, 0, n)] =
-            (self.p[ix(1, 1, n)] + self.p[ix(0, 1, n)] + self.p[ix(1, 0, n)]) / 3.0;
+        self.pc[ix(0, 0, n)] =
+            (self.pc[ix(1, 1, n)] + self.pc[ix(0, 1, n)] + self.pc[ix(1, 0, n)]) / 3.0;
 
         //bottom right corner
-        self.p[ix(self.nx - 1, 0, n)] = (self.p[ix(self.nx - 2, 1, n)]
-            + self.p[ix(self.nx - 1, 1, n)]
-            + self.p[ix(self.nx - 2, 0, n)])
+        self.pc[ix(self.nx - 1, 0, n)] = (self.pc[ix(self.nx - 2, 1, n)]
+            + self.pc[ix(self.nx - 1, 1, n)]
+            + self.pc[ix(self.nx - 2, 0, n)])
             / 3.0;
 
         //top left corner
@@ -346,7 +290,7 @@ impl Physics {
         self.p[ix(self.nx - 1, self.ny - 1, n)] = (self.p[ix(self.nx - 2, self.ny - 2, n)]
             + self.p[ix(self.nx - 1, self.ny - 2, n)]
             + self.p[ix(self.nx - 2, self.ny - 1, n)])
-            / 3.0;
+            / 3.0;*/
     }
 
     pub fn iterate(&mut self) {
@@ -362,16 +306,15 @@ impl Physics {
 
         self.face_velocity();
         self.get_links_pressure_correction();
-        //dbg!(self.p.iter().fold(0.0, |acc, x| acc + x.abs()));
+       
+        dbg!(self.p.iter().fold(0.0, |acc, x| acc + x.abs()));
         let mut pc = std::mem::take(&mut self.pc);
         self.solver(&mut pc, &self.a_p0, &self.plinks, &self.source_p, 40);
         self.pc = pc;
-        dbg!(self.pc[ix(self.nx - 20, self.ny - 2, self.nx)]);
 
         self.correct_velocity();
-        dbg!(self.u[ix(self.nx - 20, self.ny - 2, self.nx)]);
         self.correct_pressure();
-        dbg!(self.p[ix(self.nx - 20, self.ny - 2, self.nx)]);
+
     }
 }
 

@@ -26,13 +26,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut var = 0.0;
     let mut error = f32::INFINITY;
 
-    plot.pcolormesh(&physics.x, &physics.y, &physics.u, "viridis", title);
+    plot.pcolormesh(&physics.x, &physics.y, &physics.p, "viridis", title);
     plot.quiver(&physics.x, &physics.y, &physics.u, &physics.v);
     plot.setup_animation();
-    plot.update_frame(&physics.u, &physics.u, &physics.v);
+    plot.update_frame(&physics.p, &physics.u, &physics.v);
 
-
-    while iter < 500 && error.abs() > -1e-3 {
+    while iter < 1000 && error.abs() > 1e-7 {
         physics.iterate();
 
         last_var = var;
@@ -43,12 +42,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             error = var - last_var;
         }
 
-        plot.update_frame(&physics.u, &physics.u, &physics.v);
+        //plot.update_frame(&physics.p, &physics.u, &physics.v);
 
         iter += 1;
         dbg!(iter, error.abs());
     }
-
+    plot.update_frame(&physics.p, &physics.u, &physics.v);
     plot.finish_animation();
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);

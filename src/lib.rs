@@ -101,8 +101,8 @@ impl<'p> Plot<'p> {
         dict.set_item(self.py, "cmap", cmap).unwrap();
         dict.set_item(self.py, "animated", "True").unwrap();
 
-        dict.set_item(self.py, "vmin", 0.0).unwrap();
-        dict.set_item(self.py, "vmax", 2.0).unwrap();
+        dict.set_item(self.py, "vmin", -1.0).unwrap();
+        dict.set_item(self.py, "vmax", 1.0).unwrap();
 
         let c = ax
             .call_method(

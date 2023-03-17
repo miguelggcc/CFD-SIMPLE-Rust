@@ -31,8 +31,8 @@ impl Physics {
 
                 self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-                let s_x = 0.5*(self.p[ix(i - 1, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
-                let s_y = 0.5*(self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
+                let s_x = 0.5 * (self.p[ix(i - 1, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
+                let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
                 self.source_x[ix(i, j, n)] = s_x;
                 self.source_y[ix(i, j, n)] = s_y;
@@ -60,9 +60,9 @@ impl Physics {
             self.a_0[ix(i, j, n)] = a_0;
 
             self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
-            let s_x = (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
 
-            let s_y = 0.5*(self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
+            let s_x = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
+            let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
             self.source_x[ix(i, j, n)] = s_x;
             self.source_y[ix(i, j, n)] = s_y;
@@ -90,8 +90,8 @@ impl Physics {
 
             self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-            let s_x = (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
-            let s_y = 0.5*(self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
+            let s_x = 0.5 * (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
+            let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
             self.source_x[ix(i, j, n)] = s_x;
             self.source_y[ix(i, j, n)] = s_y;
@@ -119,10 +119,10 @@ impl Physics {
 
             self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-            let s_x = 0.5*(self.p[ix(i - 1, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
-            let s_y = (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
+            let s_x = 0.5 * (self.p[ix(i - 1, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
+            let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
 
-            self.source_x[ix(i, j, n)] = s_x+d_s*8.0/3.0*1.0;
+            self.source_x[ix(i, j, n)] = s_x + d_n * 8.0 / 3.0;
             self.source_y[ix(i, j, n)] = s_y;
         }
 
@@ -148,8 +148,8 @@ impl Physics {
 
             self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-            let s_x = 0.5*(self.p[ix(i - 1, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
-            let s_y = (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
+            let s_x = 0.5 * (self.p[ix(i - 1, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
+            let s_y = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
             self.source_x[ix(i, j, n)] = s_x;
             self.source_y[ix(i, j, n)] = s_y;
@@ -176,8 +176,8 @@ impl Physics {
 
         self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-        let s_x = (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
-        let s_y = (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
+        let s_x = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
+        let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
 
         self.source_x[ix(i, j, n)] = s_x;
         self.source_y[ix(i, j, n)] = s_y;
@@ -203,8 +203,8 @@ impl Physics {
 
         self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-        let s_x = (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
-        let s_y = (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
+        let s_x = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]) * self.dy;
+        let s_y = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
         self.source_x[ix(i, j, n)] = s_x;
         self.source_y[ix(i, j, n)] = s_y;
@@ -230,13 +230,13 @@ impl Physics {
 
         self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-        let s_x = (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
-        let s_y = (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
+        let s_x = 0.5 * (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
+        let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
 
         self.source_x[ix(i, j, n)] = s_x;
         self.source_y[ix(i, j, n)] = s_y;
 
-        //Bottom right wall
+        //Bottom right corner
         let j = 0;
         let i = self.nx - 1;
         let faces = &self.faces[ix(i, j, n)];
@@ -257,8 +257,8 @@ impl Physics {
 
         self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-        let s_x = (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
-        let s_y = (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
+        let s_x = 0.5 * (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
+        let s_y = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
         self.source_x[ix(i, j, n)] = s_x;
         self.source_y[ix(i, j, n)] = s_y;
