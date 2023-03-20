@@ -21,36 +21,40 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut physics = Physics::new(enviroment);
 
-    let mut last_var;
     let mut iter = 0;
-    let mut var = 0.0;
-    let mut error = f32::INFINITY;
 
-    plot.pcolormesh(&physics.x, &physics.y, &physics.p, "viridis", title);
-    plot.quiver(&physics.x, &physics.y, &physics.u, &physics.v);
+    plot.pcolormesh(&physics.x, &physics.y, &physics.u, "viridis", title);
+    //plot.quiver(&physics.x, &physics.y, &physics.u, &physics.v);
     plot.setup_animation();
-    plot.update_frame(&physics.p, &physics.u, &physics.v);
+    plot.update_frame(&physics.u, &physics.u, &physics.v, physics.nx, physics.ny);
+    let mut var = physics.u.iter().fold(0.0, |acc,x|acc+x);
 
-    while iter < 1000 && error.abs() > 1e-7 {
+    while iter < 1000 &&!var.is_nan(){
         physics.iterate();
-
-        last_var = var;
-        var = physics.u.iter().fold(0.0, |acc, x| acc + x.abs());
-        if var != 0.0 {
-            error = (var - last_var) / var;
-        } else {
-            error = var - last_var;
-        }
-
-        //plot.update_frame(&physics.p, &physics.u, &physics.v);
+        var = physics.u.iter().fold(0.0, |acc,x|acc+x);
+        plot.update_frame(&physics.p, &physics.u, &physics.v, physics.nx,physics.ny);
 
         iter += 1;
-        dbg!(iter, error.abs());
+        dbg!(iter);
     }
-    plot.update_frame(&physics.p, &physics.u, &physics.v);
+    plot.update_frame(&physics.u, &physics.u, &physics.v,physics.nx, physics.ny);
     plot.finish_animation();
+
+    plot.clf();
+    plot.streamplot(&physics.x, &physics.y, &physics.u, &physics.v);
+    plot.save("plot.png");
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
+    plot.clf();
+
+    let plot_r = Plot::new(&env, 0);
+    let x_axis: Vec<f32> = (0..iter).map(|i| i as f32).collect();
+    plot_r.semilogy(&x_axis, &physics.residuals.u);
+    plot_r.semilogy(&x_axis, &physics.residuals.v);
+    plot_r.semilogy(&x_axis, &physics.residuals.pressure);
+    let epsilon = vec![f32::EPSILON;iter];
+    plot_r.semilogy(&x_axis, &epsilon);
+    plot_r.save("residuals.png");
 
     Ok(())
 }

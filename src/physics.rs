@@ -1,14 +1,19 @@
 use itertools_num::linspace;
 use serde::{Deserialize, Serialize};
 
+mod correct_velocities;
 pub mod face_velocity;
 pub mod get_links_momentum;
 pub mod get_links_pressure_correction;
+mod residuals;
 mod solver;
+mod solver_correction;
 
 pub use face_velocity::*;
 pub use get_links_momentum::*;
 pub use get_links_pressure_correction::*;
+
+use self::residuals::Residuals;
 
 pub struct Physics {
     pub nx: usize,
@@ -37,6 +42,7 @@ pub struct Physics {
     pub v: Vec<f32>,
     pub p: Vec<f32>,
     pub pc: Vec<f32>,
+    pub residuals: Residuals,
     pub bc_n: BC,
     pub bc_w: BC,
     pub bc_s: BC,
@@ -48,7 +54,7 @@ impl Physics {
         let dx = 1.0 / (e.nx as f32);
         let dy = 1.0 / (e.ny as f32);
         let dt = e.dt;
-        let re = 10.0;
+        let re = 1.0;
         let x = linspace::<f32>(0.0, 1.0, e.nx).collect();
         let y = linspace::<f32>(0.0, 1.0, e.ny).collect();
         let mut u = vec![0.0; e.nx * e.ny];
@@ -64,12 +70,13 @@ impl Physics {
         let a_0 = vec![0.0; e.nx * e.ny];
         let a_p0 = a_0.clone();
         let mut faces = vec![Faces::default(); e.ny * e.nx];
+        let residuals = Residuals::default();
 
         Self {
             nx: e.nx,
             ny: e.ny,
             nt: e.nt,
-            nu: e.nu,
+            nu: 1e-2,
             dx,
             dy,
             rho: e.rho,
@@ -78,7 +85,7 @@ impl Physics {
             re,
             dt,
             relax_uv: 0.8,
-            relax_p: 0.1,
+            relax_p: 0.15,
             x,
             y,
             links,
@@ -91,6 +98,7 @@ impl Physics {
             faces,
             p,
             pc,
+            residuals,
             f: e.f,
             bc_n: e.bc_n,
             bc_w: e.bc_w,
@@ -99,150 +107,6 @@ impl Physics {
         }
     }
 
-    pub fn correct_velocity(&mut self) {
-        let n = self.nx;
-
-        //Interior cells
-        for j in 1..self.ny - 1 {
-            for i in 1..self.nx - 1 {
-                let a_0 = self.a_0[ix(i, j, n)];
-                let a_0_e = self.a_0[ix(i + 1, j, n)];
-                let a_0_w = self.a_0[ix(i - 1, j, n)];
-                let a_0_n = self.a_0[ix(i, j + 1, n)];
-                let a_0_s = self.a_0[ix(i, j - 1, n)];
-
-                self.u[ix(i, j, n)] += self.relax_uv
-                    * 0.5
-                    * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i + 1, j, n)])
-                    * self.dy
-                    / a_0;
-                self.v[ix(i, j, n)] += self.relax_uv
-                    * 0.5
-                    * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j + 1, n)])
-                    * self.dx
-                    / a_0;
-
-                let dpcdx_eface = self.pc[ix(i + 1, j, n)] - self.pc[ix(i, j, n)];
-                let dpcdx_wface = self.pc[ix(i, j, n)] - self.pc[ix(i - 1, j, n)];
-                let dpcdx_nface = self.pc[ix(i, j + 1, n)] - self.pc[ix(i, j, n)];
-                let dpcdx_sface = self.pc[ix(i, j, n)] - self.pc[ix(i, j - 1, n)];
-
-                let f = self.faces.get_mut(ix(i, j, n)).unwrap();
-                f.u_e += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_e) * (dpcdx_eface);
-                f.u_w += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_w) * (dpcdx_wface);
-                f.v_n += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_n) * (dpcdx_nface);
-                f.v_s += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_s) * (dpcdx_sface);
-            }
-        }
-
-        //Bottom wall
-        let j = 0;
-        for i in 1..self.nx - 1 {
-            let a_0 = self.a_0[ix(i, j, n)];
-            let a_0_e = self.a_0[ix(i + 1, j, n)];
-            let a_0_w = self.a_0[ix(i - 1, j, n)];
-            let a_0_n = self.a_0[ix(i, j + 1, n)];
-
-            self.u[ix(i, j, n)] += self.relax_uv
-                * 0.5
-                * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i + 1, j, n)])
-                * self.dy
-                / a_0;
-            self.v[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i, j, n)] - self.pc[ix(i, j + 1, n)]) * self.dx
-                    / a_0;
-
-            let dpcdx_eface = self.pc[ix(i + 1, j, n)] - self.pc[ix(i, j, n)];
-            let dpcdx_wface = self.pc[ix(i, j, n)] - self.pc[ix(i - 1, j, n)];
-            let dpcdx_nface = self.pc[ix(i, j + 1, n)] - self.pc[ix(i, j, n)];
-
-            let f = self.faces.get_mut(ix(i, j, n)).unwrap();
-            f.u_e += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_e) * (dpcdx_eface);
-            f.u_w += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_w) * (dpcdx_wface);
-            f.v_n += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_n) * (dpcdx_nface);
-        }
-
-        //Left  wall
-        let i = 0;
-        for j in 1..self.ny - 1 {
-            let a_0 = self.a_0[ix(i, j, n)];
-            let a_0_w = self.a_0[ix(i - 1, j, n)];
-            let a_0_n = self.a_0[ix(i, j + 1, n)];
-            let a_0_s = self.a_0[ix(i, j - 1, n)];
-
-            self.u[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (-self.pc[ix(i + 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
-                    / a_0;
-            self.v[ix(i, j, n)] += self.relax_uv
-                * 0.5
-                * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j + 1, n)])
-                * self.dx
-                / a_0;
-
-            let dpcdx_wface = self.pc[ix(i, j, n)] - self.pc[ix(i - 1, j, n)];
-            let dpcdx_nface = self.pc[ix(i, j + 1, n)] - self.pc[ix(i, j, n)];
-            let dpcdx_sface = self.pc[ix(i, j, n)] - self.pc[ix(i, j - 1, n)];
-
-            let f = self.faces.get_mut(ix(i, j, n)).unwrap();
-            f.u_w += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_w) * (dpcdx_wface);
-            f.v_n += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_n) * (dpcdx_nface);
-            f.v_s += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_s) * (dpcdx_sface);
-        }
-
-        //Right wall
-        let i = self.nx - 1;
-        for j in 1..self.ny - 1 {
-            let a_0 = self.a_0[ix(i, j, n)];
-            let a_0_w = self.a_0[ix(i - 1, j, n)];
-            let a_0_n = self.a_0[ix(i, j + 1, n)];
-            let a_0_s = self.a_0[ix(i, j - 1, n)];
-
-            self.u[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (-self.pc[ix(i - 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
-                    / a_0;
-            self.v[ix(i, j, n)] += self.relax_uv
-                * 0.5
-                * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j + 1, n)])
-                * self.dx
-                / a_0;
-
-            let dpcdx_wface = self.pc[ix(i, j, n)] - self.pc[ix(i - 1, j, n)];
-            let dpcdx_nface = self.pc[ix(i, j + 1, n)] - self.pc[ix(i, j, n)];
-            let dpcdx_sface = self.pc[ix(i, j, n)] - self.pc[ix(i, j - 1, n)];
-
-            let f = self.faces.get_mut(ix(i, j, n)).unwrap();
-            f.u_w += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_w) * (dpcdx_wface);
-            f.v_n += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_n) * (dpcdx_nface);
-            f.v_s += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_s) * (dpcdx_sface);
-        }
-
-        //Top wall
-        let j = self.ny - 1;
-        for i in 1..self.nx - 1 {
-            let a_0 = self.a_0[ix(i, j, n)];
-            let a_0_e = self.a_0[ix(i + 1, j, n)];
-            let a_0_w = self.a_0[ix(i - 1, j, n)];
-            let a_0_s = self.a_0[ix(i, j - 1, n)];
-
-            self.u[ix(i, j, n)] += self.relax_uv
-                * 0.5
-                * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i + 1, j, n)])
-                * self.dy
-                / a_0;
-            self.v[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j, n)]) * self.dx
-                    / a_0;
-
-            let dpcdx_eface = self.pc[ix(i + 1, j, n)] - self.pc[ix(i, j, n)];
-            let dpcdx_wface = self.pc[ix(i, j, n)] - self.pc[ix(i - 1, j, n)];
-            let dpcdx_sface = self.pc[ix(i, j, n)] - self.pc[ix(i, j - 1, n)];
-
-            let f = self.faces.get_mut(ix(i, j, n)).unwrap();
-            f.u_e += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_e) * (dpcdx_eface);
-            f.u_w += self.relax_uv * 0.5 * self.dy * (1.0 / a_0 + 1.0 / a_0_w) * (dpcdx_wface);
-            f.v_s += self.relax_uv * 0.5 * self.dx * (1.0 / a_0 + 1.0 / a_0_s) * (dpcdx_sface);
-        }
-    }
     pub fn correct_pressure(&mut self) {
         let n = self.nx;
 
@@ -250,7 +114,6 @@ impl Physics {
             .iter_mut()
             .zip(&self.pc)
             .for_each(|(p, pc)| *p += self.relax_p * pc);
-
         /*//bottom wall
         for i in 1..self.nx - 1 {
             self.pc[ix(i, 0, n)] = self.pc[ix(i, 1, n)];
@@ -295,26 +158,31 @@ impl Physics {
 
     pub fn iterate(&mut self) {
         self.get_links_momentum();
-        //dbg!(self.v[ix(self.nx - 20, self.ny - 2, self.nx)]);
+        dbg!(self.u[ix(self.nx-20, self.ny - 1, self.nx)]);
 
+        self.save_u_residual();
         let mut u = std::mem::take(&mut self.u);
-        self.solver(&mut u, &self.a_0, &self.links, &self.source_x, 2);
+        self.solver_correction(&mut u, &self.a_0, &self.links, &self.source_x, 4, 0.2);
         self.u = u;
+
+        self.save_v_residual();
         let mut v = std::mem::take(&mut self.v);
-        self.solver(&mut v, &self.a_0, &self.links, &self.source_y, 2);
+        self.solver_correction(&mut v, &self.a_0, &self.links, &self.source_y, 4, 0.2);
         self.v = v;
 
         self.face_velocity();
         self.get_links_pressure_correction();
-       
-        dbg!(self.p.iter().fold(0.0, |acc, x| acc + x.abs()));
+
+        self.save_pressure_residual();
         let mut pc = std::mem::take(&mut self.pc);
-        self.solver(&mut pc, &self.a_p0, &self.plinks, &self.source_p, 40);
+        self.solver(&mut pc, &self.a_p0, &self.plinks, &self.source_p, 20);
         self.pc = pc;
+        dbg!(self.pc.iter().fold(0.0, |acc, x| acc + x.abs()));
 
-        self.correct_velocity();
+        self.correct_cell_velocities();
+        self.correct_face_velocities();
         self.correct_pressure();
-
+        self.pc = vec![0.0; self.nx * self.ny];
     }
 }
 

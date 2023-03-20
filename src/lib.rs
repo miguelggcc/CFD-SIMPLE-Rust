@@ -1,6 +1,8 @@
+use cpython::FromPyObject;
 use cpython::NoArgs;
 use cpython::ObjectProtocol; //for call method
 use cpython::PyDict;
+use cpython::PyList;
 use cpython::PyObject;
 use cpython::Python;
 use cpython::{PyModule, PyTuple};
@@ -85,6 +87,21 @@ impl<'p> Plot<'p> {
         let _ = self.plt.call(self.py, "scatter", (x, y), None).unwrap();
     }
 
+    pub fn plot(&self, x: &[f32], y: &[f32]) {
+        assert!(x.len() == y.len());
+        let _ = self.plt.call(self.py, "plot", (x, y), None).unwrap();
+    }
+
+    pub fn semilogx(&self, x: &[f32], y: &[f32]) {
+        assert!(x.len() == y.len());
+        let _ = self.plt.call(self.py, "semilogx", (x, y), None).unwrap();
+    }
+
+    pub fn semilogy(&self, x: &[f32], y: &[f32]) {
+        assert!(x.len() == y.len());
+        let _ = self.plt.call(self.py, "semilogy", (x, y), None).unwrap();
+    }
+
     pub fn pcolormesh(&mut self, x: &[f32], y: &[f32], z: &[f32], cmap: &str, title: &str) {
         let subplots = PyDict::new(self.py);
         subplots.set_item(self.py, "figsize", (6, 6)).unwrap();
@@ -101,7 +118,7 @@ impl<'p> Plot<'p> {
         dict.set_item(self.py, "cmap", cmap).unwrap();
         dict.set_item(self.py, "animated", "True").unwrap();
 
-        dict.set_item(self.py, "vmin", -1.0).unwrap();
+        dict.set_item(self.py, "vmin", 0.0).unwrap();
         dict.set_item(self.py, "vmax", 1.0).unwrap();
 
         let c = ax
@@ -130,9 +147,9 @@ impl<'p> Plot<'p> {
         self.artists.push(c);
     }
 
-    pub fn quiver(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32]) {
-        let np_u = self.reshape(u, 41, 41);
-        let np_v = self.reshape(v, 41, 41);
+    pub fn quiver(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32],) {
+        let np_u = self.reshape(u, x.len(), y.len());
+        let np_v = self.reshape(v, x.len(), y.len());
 
         let dictq = PyDict::new(self.py);
         dictq.set_item(self.py, "scale", 1 * x.len() / 30).unwrap();
@@ -145,6 +162,32 @@ impl<'p> Plot<'p> {
         self.artists.push(q);
     }
 
+    pub fn streamplot(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32]) {
+        let np_u = self.reshape(u, x.len(), y.len());
+        let np_v = self.reshape(v, x.len(), y.len());
+
+        let dictq = PyDict::new(self.py);
+        dictq.set_item(self.py, "density", 2.0).unwrap();
+
+        let list = PyList::extract(
+            self.py,
+            &self.np.call(self.py, "meshgrid", (x, y), None).unwrap(),
+        )
+        .unwrap();
+
+        let np_x = list.get_item(self.py, 0);
+        let np_y = list.get_item(self.py, 1);
+
+        self.plt
+            .call(
+                self.py,
+                "streamplot",
+                (np_x, np_y, np_u, np_v),
+                Some(&dictq),
+            )
+            .unwrap();
+    }
+
     pub fn setup_animation(&self) {
         let fig = self.plt.call(self.py, "gcf", NoArgs, None).unwrap();
         self.writer
@@ -152,16 +195,16 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn update_frame(&self, z: &[f32], u: &[f32], v: &[f32]) {
-        let np_z = self.reshape(z, 41, 41);
-        let np_u = self.reshape(u, 41, 41);
-        let np_v = self.reshape(v, 41, 41);
+    pub fn update_frame(&self, z: &[f32], u: &[f32], v: &[f32], x_len: usize, y_len: usize) {
+        let np_z = self.reshape(z, x_len, y_len);
+        let np_u = self.reshape(u, x_len, y_len);
+        let np_v = self.reshape(v, x_len, y_len);
         self.artists[0]
             .call_method(self.py, "set_data", (&np_z,), None)
             .unwrap();
-        self.artists[1]
+        /*self.artists[1]
             .call_method(self.py, "set_UVC", (&np_u, &np_v), None)
-            .unwrap();
+            .unwrap();*/
         self.writer
             .call_method(self.py, "grab_frame", NoArgs, None)
             .unwrap();
