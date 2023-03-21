@@ -2,23 +2,23 @@ pub use super::Physics;
 use crate::physics::ix;
 
 impl Physics {
-    pub fn face_velocity(&mut self) {
+    pub fn get_face_velocities(&mut self) {
         let n = self.nx;
 
         #[inline(always)]
         fn pwim(
-            vel: &[f32],
-            a_0: &[f32],
-            dpdx_0: f32,
-            dpdx_other: f32,
-            dpdx_face: f32,
+            vel: &[f64],
+            a_0: &[f64],
+            dpdx_0: f64,
+            dpdx_other: f64,
+            dpdx_face: f64,
             i: usize,
             j: usize,
             i_other: usize,
             j_other: usize,
-            d: f32,
+            d: f64,
             n: usize,
-        ) -> f32 {
+        ) -> f64 {
             0.5 * (vel[ix(i, j, n)] + vel[ix(i_other, j_other, n)])
                 + 0.5
                     * (dpdx_0 / a_0[ix(i, j, n)] + dpdx_other / a_0[ix(i_other, j_other, n)]
@@ -140,7 +140,7 @@ impl Physics {
             let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             let dpdx_0 = 0.5 * (self.p[ix(i + 1, j, n)] - self.p[ix(i - 1, j, n)]);
-            let dpdx_e = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i + 1, j, n)]); //(pe+p0)/2-pe
+            let dpdx_e = 0.5 * (self.p[ix(i + 1, j, n)] - self.p[ix(i, j, n)]); //(pe+p0)/2-pe
             let dpdx_w = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i - 2, j, n)]);
             let dpdx_eface = self.p[ix(i + 1, j, n)] - self.p[ix(i, j, n)];
             let dpdx_wface = self.p[ix(i, j, n)] - self.p[ix(i - 1, j, n)];
@@ -371,43 +371,13 @@ impl Physics {
 
             f.v_s = 0.0;
         }
-
-        //-------------------------------Left wall---------------------------------------------------
-        /*let i = 0;
-        for j in 0..self.ny {
-            let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
-
-            f.v_n = 0.0;
-
-            f.v_s = 0.0;
-        }*/
-
-        //-------------------------------Right wall---------------------------------------------------
-        /*let i = self.nx - 1;
-        for j in 0..self.ny {
-            let f: &mut Faces = self.faces.get_mut(ix(i, j, n)).unwrap();
-
-            f.v_n = 0.0;
-
-            f.v_s = 0.0;
-        }*/
-
-        /*let file = File::create("out.txt").unwrap();
-        let mut buffer = io::BufWriter::new(file);
-        for j in 0..self.ny{
-            let mut line = String::new();
-            for i in 0..self.nx{
-                let f = &self.faces[ix(i,j,n)];
-                line.push_str(format!["{} {} ",f.v_n,f.v_s].as_str());
-            }
-            writeln!(buffer, "{}", line).unwrap();
-        }*/
     }
 }
+
 #[derive(Clone, Default)]
 pub struct Faces {
-    pub u_e: f32,
-    pub u_w: f32,
-    pub v_n: f32,
-    pub v_s: f32,
+    pub u_e: f64,
+    pub u_w: f64,
+    pub v_n: f64,
+    pub v_s: f64,
 }

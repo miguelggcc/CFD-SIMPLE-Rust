@@ -5,10 +5,10 @@ use crate::{maths::tridiagonal_solver, physics::ix};
 impl Physics {
     pub fn solver(
         &self,
-        x: &mut [f32],
-        a_0: &[f32],
+        x: &mut [f64],
+        a_0: &[f64],
         links: &[Links],
-        sources: &[f32],
+        sources: &[f64],
         iter: usize,
     ) {
         let n = self.nx;
@@ -252,14 +252,14 @@ impl Physics {
 }
 
 #[inline(always)]
-fn replace_row(row: usize, x: &mut [f32], solx: &[f32], nx: usize) {
+fn replace_row(row: usize, x: &mut [f64], solx: &[f64], nx: usize) {
     for i in 0..nx {
         x[ix(i, row, nx)] = solx[i];
     }
 }
 
 #[inline(always)]
-fn replace_column(column: usize, x: &mut [f32], soly: &[f32], nx: usize, ny: usize) {
+fn replace_column(column: usize, x: &mut [f64], soly: &[f64], nx: usize, ny: usize) {
     for j in 0..ny {
         x[ix(column, j, nx)] = soly[j];
     }

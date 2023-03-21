@@ -4,7 +4,9 @@ use cpython::ObjectProtocol; //for call method
 use cpython::PyDict;
 use cpython::PyList;
 use cpython::PyObject;
+use cpython::PyString;
 use cpython::Python;
+use cpython::PythonObject;
 use cpython::{PyModule, PyTuple};
 
 pub struct Env {
@@ -82,27 +84,27 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn scatter(&self, x: &[f32], y: &[f32]) {
+    pub fn scatter(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "scatter", (x, y), None).unwrap();
     }
 
-    pub fn plot(&self, x: &[f32], y: &[f32]) {
+    pub fn plot(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "plot", (x, y), None).unwrap();
     }
 
-    pub fn semilogx(&self, x: &[f32], y: &[f32]) {
+    pub fn semilogx(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "semilogx", (x, y), None).unwrap();
     }
 
-    pub fn semilogy(&self, x: &[f32], y: &[f32]) {
+    pub fn semilogy(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "semilogy", (x, y), None).unwrap();
     }
 
-    pub fn pcolormesh(&mut self, x: &[f32], y: &[f32], z: &[f32], cmap: &str, title: &str) {
+    pub fn pcolormesh(&mut self, x: &[f64], y: &[f64], z: &[f64], cmap: &str, title: &str) {
         let subplots = PyDict::new(self.py);
         subplots.set_item(self.py, "figsize", (6, 6)).unwrap();
         subplots.set_item(self.py, "dpi", 100).unwrap();
@@ -147,7 +149,7 @@ impl<'p> Plot<'p> {
         self.artists.push(c);
     }
 
-    pub fn quiver(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32],) {
+    pub fn quiver(&mut self, x: &[f64], y: &[f64], u: &[f64], v: &[f64]) {
         let np_u = self.reshape(u, x.len(), y.len());
         let np_v = self.reshape(v, x.len(), y.len());
 
@@ -162,7 +164,7 @@ impl<'p> Plot<'p> {
         self.artists.push(q);
     }
 
-    pub fn streamplot(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32]) {
+    pub fn streamplot(&mut self, x: &[f64], y: &[f64], u: &[f64], v: &[f64]) {
         let np_u = self.reshape(u, x.len(), y.len());
         let np_v = self.reshape(v, x.len(), y.len());
 
@@ -188,6 +190,42 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
+    pub fn contourf(&mut self, x: &[f64], y: &[f64], z: &[f64], cmap: &str, title: &str) {
+        let subplots = PyDict::new(self.py);
+        subplots.set_item(self.py, "figsize", (6, 6)).unwrap();
+        subplots.set_item(self.py, "dpi", 100).unwrap();
+        let fig = self
+            .plt
+            .call(self.py, "figure", NoArgs, Some(&subplots))
+            .unwrap();
+        let ax = fig
+            .call_method(self.py, "add_subplot", (111,), None)
+            .unwrap();
+
+        let dict = PyDict::new(self.py);
+        dict.set_item(self.py, "cmap", cmap).unwrap();
+
+        let z_np = self.reshape(z, x.len(), y.len());
+
+        let c = ax
+            .call_method(self.py, "contourf", (x, y, z_np, 30), Some(&dict))
+            .unwrap();
+
+        ax.call_method(self.py, "set_title", (title,), None)
+            .unwrap();
+        ax.call_method(self.py, "set_aspect", ("equal",), None)
+            .unwrap();
+
+        let dict2 = PyDict::new(self.py);
+        dict2.set_item(self.py, "ax", ax).unwrap();
+        dict2.set_item(self.py, "fraction", 0.046).unwrap();
+        dict2.set_item(self.py, "pad", 0.04).unwrap();
+        fig.call_method(self.py, "tight_layout", NoArgs, None)
+            .unwrap();
+        fig.call_method(self.py, "colorbar", (&c,), Some(&dict2))
+            .unwrap();
+    }
+
     pub fn setup_animation(&self) {
         let fig = self.plt.call(self.py, "gcf", NoArgs, None).unwrap();
         self.writer
@@ -195,7 +233,7 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn update_frame(&self, z: &[f32], u: &[f32], v: &[f32], x_len: usize, y_len: usize) {
+    pub fn update_frame(&self, z: &[f64], u: &[f64], v: &[f64], x_len: usize, y_len: usize) {
         let np_z = self.reshape(z, x_len, y_len);
         let np_u = self.reshape(u, x_len, y_len);
         let np_v = self.reshape(v, x_len, y_len);
@@ -203,8 +241,8 @@ impl<'p> Plot<'p> {
             .call_method(self.py, "set_data", (&np_z,), None)
             .unwrap();
         /*self.artists[1]
-            .call_method(self.py, "set_UVC", (&np_u, &np_v), None)
-            .unwrap();*/
+        .call_method(self.py, "set_UVC", (&np_u, &np_v), None)
+        .unwrap();*/
         self.writer
             .call_method(self.py, "grab_frame", NoArgs, None)
             .unwrap();
@@ -232,6 +270,13 @@ impl<'p> Plot<'p> {
         let _ = self.plt.call(self.py, "grid", (grid,), None).unwrap();
     }
 
+    pub fn legend(&self, labels:&[&str]){
+        let gca = self.plt.call(self.py,"gca",NoArgs,None).unwrap();
+        let labels: Vec<PyObject> = labels.iter().map(|l|PyString::new(self.py, *l).into_object()).collect();
+        let labels = PyList::new(self.py, &labels);
+        gca.call_method(self.py, "legend", (labels,), None).unwrap();
+    }
+
     pub fn draw(&self) {
         let _ = self
             .plt
@@ -247,16 +292,16 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn reshape(&self, values: &[f32], a: usize, b: usize) -> PyObject {
+    pub fn reshape(&self, values: &[f64], a: usize, b: usize) -> PyObject {
         self.np
             .call(self.py, "reshape", (values, (a, b)), None)
             .unwrap()
     }
 }
 
-/*pub fn reduce_in_half(vec: &[f32], nx: usize, ny: usize) -> Vec<f32> {
-    let nx2 = (nx as f32 / 2.0).ceil() as usize;
-    let ny2 = (ny as f32 / 2.0).ceil() as usize;
+/*pub fn reduce_in_half(vec: &[f64], nx: usize, ny: usize) -> Vec<f64> {
+    let nx2 = (nx as f64 / 2.0).ceil() as usize;
+    let ny2 = (ny as f64 / 2.0).ceil() as usize;
 
     let mut vec2 = vec![0.0; nx2 * ny2];
     for j in 0..ny2 {
