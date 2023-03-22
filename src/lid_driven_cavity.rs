@@ -9,7 +9,7 @@ mod solver_correction;
 
 use itertools_num::linspace;
 
-use crate::{tools::ix, Case};
+use crate::Case;
 
 use self::{face_velocity::Faces, residuals::Residuals};
 

@@ -17,8 +17,8 @@ pub struct Env {
 }
 
 impl Env {
-    pub fn new() -> Env {
-        Env {
+    pub fn new() -> Self {
+        Self {
             gil: Python::acquire_gil(),
         }
     }
@@ -238,14 +238,14 @@ impl<'p> Plot<'p> {
     }
 
     pub fn axis(&self, par: &str) {
-        self.plt.call(self.py, "axis", (par,), None);
+        self.plt.call(self.py, "axis", (par,), None).unwrap();
     }
 
     pub fn legend(&self, labels: &[&str]) {
         let gca = self.plt.call(self.py, "gca", NoArgs, None).unwrap();
         let labels: Vec<PyObject> = labels
             .iter()
-            .map(|l| PyString::new(self.py, *l).into_object())
+            .map(|l| PyString::new(self.py, l).into_object())
             .collect();
         let labels = PyList::new(self.py, &labels);
         gca.call_method(self.py, "legend", (labels,), None).unwrap();
@@ -282,7 +282,7 @@ pub struct Animation<'p> {
 }
 
 impl<'p> Animation<'p> {
-    pub fn new<'a>(env: &'p Env, plot: Plot<'p>, fps: u32) -> Animation<'p> {
+    pub fn new(env: &'p Env, plot: Plot<'p>, fps: u32) -> Animation<'p> {
         let py = env.gil.python();
         let plt = PyModule::import(py, "matplotlib.pyplot").unwrap();
         let np = PyModule::import(py, "numpy").unwrap();

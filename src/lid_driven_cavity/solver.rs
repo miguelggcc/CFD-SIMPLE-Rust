@@ -227,9 +227,7 @@ impl LidDrivenCavity {
 
 #[inline(always)]
 fn replace_row(row: usize, x: &mut [f32], solx: &[f32], nx: usize) {
-    for i in 0..nx {
-        x[ix(i, row, nx)] = solx[i];
-    }
+        x[ix(0, row, nx)..ix(nx, row, nx)].copy_from_slice(solx);
 }
 
 #[inline(always)]

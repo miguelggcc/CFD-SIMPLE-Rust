@@ -2,7 +2,7 @@ mod plotter;
 
 use std::time::Instant;
 
-use CFDplotlib::Cases;
+use cfd_rust::Cases;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let now = Instant::now();

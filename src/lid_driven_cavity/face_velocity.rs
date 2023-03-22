@@ -13,17 +13,14 @@ impl LidDrivenCavity {
             dpdx_0: f32,
             dpdx_other: f32,
             dpdx_face: f32,
-            i: usize,
-            j: usize,
-            i_other: usize,
-            j_other: usize,
+            index: usize,
+            index_other: usize,
             d: f32,
-            n: usize,
         ) -> f32 {
-            0.5 * (vel[ix(i, j, n)] + vel[ix(i_other, j_other, n)])
+            0.5 * (vel[index] + vel[index_other])
                 + 0.5
-                    * (dpdx_0 / a_0[ix(i, j, n)] + dpdx_other / a_0[ix(i_other, j_other, n)]
-                        - (1.0 / a_0[ix(i, j, n)] + 1.0 / a_0[ix(i_other, j_other, n)]) * dpdx_face)
+                    * (dpdx_0 / a_0[index] + dpdx_other / a_0[index_other]
+                        - (1.0 / a_0[index] + 1.0 / a_0[index_other]) * dpdx_face)
                     * d
         }
 
@@ -46,12 +43,9 @@ impl LidDrivenCavity {
                     dpdx_0,
                     dpdx_e,
                     dpdx_eface,
-                    i,
-                    j,
-                    i + 1,
-                    j,
+                    ix(i, j, n),
+                    ix(i + 1, j, n),
                     self.dy,
-                    n,
                 );
 
                 f.u_w = pwim(
@@ -60,12 +54,9 @@ impl LidDrivenCavity {
                     dpdx_0,
                     dpdx_w,
                     dpdx_wface,
-                    i,
-                    j,
-                    i - 1,
-                    j,
+                    ix(i, j, n),
+                    ix(i - 1, j, n),
                     self.dy,
-                    n,
                 );
             }
         }
@@ -87,12 +78,9 @@ impl LidDrivenCavity {
                 dpdx_0,
                 dpdx_e,
                 dpdx_eface,
-                i,
-                j,
-                i + 1,
-                j,
+                ix(i, j, n),
+                ix(i + 1, j, n),
                 self.dy,
-                n,
             );
 
             f.u_w = pwim(
@@ -101,12 +89,9 @@ impl LidDrivenCavity {
                 dpdx_0,
                 dpdx_w,
                 dpdx_wface,
-                i,
-                j,
-                i - 1,
-                j,
+                ix(i, j, n),
+                ix(i - 1, j, n),
                 self.dy,
-                n,
             );
         }
 
@@ -124,12 +109,9 @@ impl LidDrivenCavity {
                 dpdx_0,
                 dpdx_e,
                 dpdx_eface,
-                i,
-                j,
-                i + 1,
-                j,
+                ix(i, j, n),
+                ix(i + 1, j, n),
                 self.dy,
-                n,
             );
 
             f.u_w = 0.0;
@@ -152,12 +134,9 @@ impl LidDrivenCavity {
                 dpdx_0,
                 dpdx_e,
                 dpdx_eface,
-                i,
-                j,
-                i + 1,
-                j,
+                ix(i, j, n),
+                ix(i + 1, j, n),
                 self.dy,
-                n,
             );
 
             f.u_w = pwim(
@@ -166,12 +145,9 @@ impl LidDrivenCavity {
                 dpdx_0,
                 dpdx_w,
                 dpdx_wface,
-                i,
-                j,
-                i - 1,
-                j,
+                ix(i, j, n),
+                ix(i - 1, j, n),
                 self.dy,
-                n,
             );
         }
 
@@ -191,12 +167,9 @@ impl LidDrivenCavity {
                 dpdx_0,
                 dpdx_w,
                 dpdx_wface,
-                i,
-                j,
-                i - 1,
-                j,
+                ix(i, j, n),
+                ix(i - 1, j, n),
                 self.dy,
-                n,
             );
         }
 
@@ -219,12 +192,9 @@ impl LidDrivenCavity {
                     dpdy_0,
                     dpdy_n,
                     dpdy_nface,
-                    i,
-                    j,
-                    i,
-                    j + 1,
+                    ix(i, j, n),
+                    ix(i, j + 1, n),
                     self.dx,
-                    n,
                 );
 
                 f.v_s = pwim(
@@ -233,12 +203,9 @@ impl LidDrivenCavity {
                     dpdy_0,
                     dpdy_s,
                     dpdy_sface,
-                    i,
-                    j,
-                    i,
-                    j - 1,
+                    ix(i, j, n),
+                    ix(i, j - 1, n),
                     self.dx,
-                    n,
                 );
             }
         }
@@ -260,12 +227,9 @@ impl LidDrivenCavity {
                 dpdy_0,
                 dpdy_n,
                 dpdy_nface,
-                i,
-                j,
-                i,
-                j + 1,
+                ix(i, j, n),
+                ix(i, j + 1, n),
                 self.dx,
-                n,
             );
 
             f.v_s = pwim(
@@ -274,12 +238,9 @@ impl LidDrivenCavity {
                 dpdy_0,
                 dpdy_s,
                 dpdy_sface,
-                i,
-                j,
-                i,
-                j - 1,
+                ix(i, j, n),
+                ix(i, j - 1, n),
                 self.dx,
-                n,
             );
         }
 
@@ -299,12 +260,9 @@ impl LidDrivenCavity {
                 dpdy_0,
                 dpdy_s,
                 dpdy_sface,
-                i,
-                j,
-                i,
-                j - 1,
+                ix(i, j, n),
+                ix(i, j - 1, n),
                 self.dx,
-                n,
             );
         }
 
@@ -325,12 +283,9 @@ impl LidDrivenCavity {
                 dpdy_0,
                 dpdy_n,
                 dpdy_nface,
-                i,
-                j,
-                i,
-                j + 1,
+                ix(i, j, n),
+                ix(i, j + 1, n),
                 self.dx,
-                n,
             );
 
             f.v_s = pwim(
@@ -339,12 +294,9 @@ impl LidDrivenCavity {
                 dpdy_0,
                 dpdy_s,
                 dpdy_sface,
-                i,
-                j,
-                i,
-                j - 1,
+                ix(i, j, n),
+                ix(i, j - 1, n),
                 self.dx,
-                n,
             );
         }
 
@@ -362,12 +314,9 @@ impl LidDrivenCavity {
                 dpdy_0,
                 dpdy_n,
                 dpdy_nface,
-                i,
-                j,
-                i,
-                j + 1,
+                ix(i, j, n),
+                ix(i, j + 1, n),
                 self.dx,
-                n,
             );
 
             f.v_s = 0.0;
