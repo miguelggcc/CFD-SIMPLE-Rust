@@ -96,7 +96,7 @@ impl LidDrivenCavity {
 
 #[derive(Default)]
 pub struct Residuals {
-    pub pressure: Vec<f64>,
-    pub u: Vec<f64>,
-    pub v: Vec<f64>,
+    pub pressure: Vec<f32>,
+    pub u: Vec<f32>,
+    pub v: Vec<f32>,
 }

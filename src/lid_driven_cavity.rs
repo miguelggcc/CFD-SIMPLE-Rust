@@ -16,36 +16,36 @@ use self::{face_velocity::Faces, residuals::Residuals};
 pub struct LidDrivenCavity {
     pub nx: usize,
     pub ny: usize,
-    pub re: f64, //Reynolds number
-    pub dx: f64,
-    pub dy: f64,
-    pub nu: f64,
-    pub rho: f64,
-    pub relax_uv: f64,
-    pub relax_p: f64,
-    pub x: Vec<f64>,
-    pub y: Vec<f64>,
+    pub re: f32, //Reynolds number
+    pub dx: f32,
+    pub dy: f32,
+    pub nu: f32,
+    pub rho: f32,
+    pub relax_uv: f32,
+    pub relax_p: f32,
+    pub x: Vec<f32>,
+    pub y: Vec<f32>,
     pub links: Vec<Links>,
     pub plinks: Vec<Links>,
-    pub source_x: Vec<f64>,
-    pub source_y: Vec<f64>,
-    pub source_p: Vec<f64>,
-    pub a_0: Vec<f64>,
-    pub a_p0: Vec<f64>,
+    pub source_x: Vec<f32>,
+    pub source_y: Vec<f32>,
+    pub source_p: Vec<f32>,
+    pub a_0: Vec<f32>,
+    pub a_p0: Vec<f32>,
     pub faces: Vec<Faces>,
-    pub u: Vec<f64>,
-    pub v: Vec<f64>,
-    pub p: Vec<f64>,
-    pub pc: Vec<f64>,
+    pub u: Vec<f32>,
+    pub v: Vec<f32>,
+    pub p: Vec<f32>,
+    pub pc: Vec<f32>,
     pub residuals: Residuals,
 }
 
 impl LidDrivenCavity {
-    pub fn new(nx: usize, ny: usize, re: f64) -> Self {
-        let dx = 1.0 / (nx as f64);
-        let dy = 1.0 / (ny as f64);
-        let x = linspace::<f64>(0.0, 1.0, nx).collect();
-        let y = linspace::<f64>(0.0, 1.0, ny).collect();
+    pub fn new(nx: usize, ny: usize, re: f32) -> Self {
+        let dx = 1.0 / (nx as f32);
+        let dy = 1.0 / (ny as f32);
+        let x = linspace::<f32>(0.0, 1.0, nx).collect();
+        let y = linspace::<f32>(0.0, 1.0, ny).collect();
         let u = vec![0.0; nx * ny];
 
         let v = vec![0.0; nx * ny];
@@ -130,14 +130,14 @@ impl Case for LidDrivenCavity {
 
 #[derive(Clone, Default)]
 pub struct Links {
-    pub a_e: f64,
-    pub a_w: f64,
-    pub a_n: f64,
-    pub a_s: f64,
+    pub a_e: f32,
+    pub a_w: f32,
+    pub a_n: f32,
+    pub a_s: f32,
 }
 
 impl Links {
-    pub fn set_links(&mut self, a_e: f64, a_w: f64, a_n: f64, a_s: f64) {
+    pub fn set_links(&mut self, a_e: f32, a_w: f32, a_n: f32, a_s: f32) {
         self.a_e = a_e;
         self.a_w = a_w;
         self.a_n = a_n;

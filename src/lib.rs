@@ -18,7 +18,7 @@ pub enum Cases {
 }
 
 impl Cases {
-    pub fn new(case: &str, nx: usize, ny: usize, re: f64) -> Self {
+    pub fn new(case: &str, nx: usize, ny: usize, re: f32) -> Self {
         match case {
             "lid_driven_cavity" => Cases::LidDrivenCavity(LidDrivenCavity::new(nx, ny, re)),
             _ => unreachable!(),

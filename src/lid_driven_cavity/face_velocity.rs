@@ -8,18 +8,18 @@ impl LidDrivenCavity {
 
         #[inline(always)]
         fn pwim(
-            vel: &[f64],
-            a_0: &[f64],
-            dpdx_0: f64,
-            dpdx_other: f64,
-            dpdx_face: f64,
+            vel: &[f32],
+            a_0: &[f32],
+            dpdx_0: f32,
+            dpdx_other: f32,
+            dpdx_face: f32,
             i: usize,
             j: usize,
             i_other: usize,
             j_other: usize,
-            d: f64,
+            d: f32,
             n: usize,
-        ) -> f64 {
+        ) -> f32 {
             0.5 * (vel[ix(i, j, n)] + vel[ix(i_other, j_other, n)])
                 + 0.5
                     * (dpdx_0 / a_0[ix(i, j, n)] + dpdx_other / a_0[ix(i_other, j_other, n)]
@@ -377,8 +377,8 @@ impl LidDrivenCavity {
 
 #[derive(Clone, Default)]
 pub struct Faces {
-    pub u_e: f64,
-    pub u_w: f64,
-    pub v_n: f64,
-    pub v_s: f64,
+    pub u_e: f32,
+    pub u_w: f32,
+    pub v_n: f32,
+    pub v_s: f32,
 }
