@@ -1,7 +1,8 @@
-pub use super::Physics;
-use crate::physics::ix;
+use crate::tools::ix;
 
-impl Physics {
+use super::LidDrivenCavity;
+
+impl LidDrivenCavity {
     pub fn correct_cell_velocities(&mut self) {
         let n = self.nx;
         //------u velocity------------------
@@ -158,5 +159,12 @@ impl Physics {
                 self.relax_uv * 0.5 * (self.pc[ix(i, j - 1, n)] - self.pc[ix(i, j, n)]) * self.dx
                     / (1.0 / a_0 + 1.0 / a_0s);
         }
+    }
+
+    pub fn correct_pressure(&mut self) {
+        self.p
+            .iter_mut()
+            .zip(&self.pc)
+            .for_each(|(p, pc)| *p += self.relax_p * pc);
     }
 }

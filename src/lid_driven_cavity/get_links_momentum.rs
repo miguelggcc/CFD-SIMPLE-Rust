@@ -1,7 +1,8 @@
-pub use super::Physics;
-use crate::physics::ix;
+use crate::tools::ix;
 
-impl Physics {
+use super::LidDrivenCavity;
+
+impl LidDrivenCavity {
     pub fn get_links_momentum(&mut self) {
         let n = self.nx;
 

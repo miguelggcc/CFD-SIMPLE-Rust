@@ -1,17 +1,18 @@
-use std::io::Write;
-use std::{fs::File, io};
+//use std::io::Write;
+//use std::{fs::File, io};
 
-pub use super::Physics;
-use crate::physics::ix;
+use crate::tools::ix;
 
-impl Physics {
+use super::LidDrivenCavity;
+
+impl LidDrivenCavity {
     pub fn save_pressure_residual(&mut self) {
         let n = self.nx;
         let mut res = 0.0;
-        let file = File::create("out.txt").unwrap();
-        let mut buffer = io::BufWriter::new(file);
+        //let file = File::create("out.txt").unwrap();
+        //let mut buffer = io::BufWriter::new(file);
         for j in 1..self.ny - 1 {
-            let mut line = String::new();
+            //let mut line = String::new();
             for i in 1..self.nx - 1 {
                 let f = &self.faces[ix(i, j, n)];
                 let l = &self.plinks[ix(i, j, n)];
@@ -24,12 +25,10 @@ impl Physics {
                     + self.a_p0[ix(i, j, n)] * self.pc[ix(i, j, n)]
                     - mdot)
                     .powi(2);
-                if ix(i, j, n) == ix(20, 20, n) {
-                    dbg!(self.pc[ix(i, j, n)] - self.pc[ix(i - 1, j, n)], mdot);
-                }
-                line.push_str(format!["{},{} ", f.u_w - f.u_e, f.v_n - f.v_s].as_str());
+
+                //line.push_str(format!["{},{} ", f.u_w - f.u_e, f.v_n - f.v_s].as_str());
             }
-            writeln!(buffer, "{}", line).unwrap();
+            //writeln!(buffer, "{}", line).unwrap();
         }
         res = res.sqrt();
         self.residuals.pressure.push(res);

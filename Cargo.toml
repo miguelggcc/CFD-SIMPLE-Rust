@@ -5,8 +5,6 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-serde= {version = "1.0.152", features = ["derive"]}
-serde_json = "1.0.92"
 itertools-num = "0.1.3"
 [dependencies.cpython]
 git = "https://github.com/dgrunwald/rust-cpython.git"
