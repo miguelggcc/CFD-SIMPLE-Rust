@@ -79,27 +79,27 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn scatter(&self, x: &[f32], y: &[f32]) {
+    pub fn scatter(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "scatter", (x, y), None).unwrap();
     }
 
-    pub fn plot(&self, x: &[f32], y: &[f32]) {
+    pub fn plot(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "plot", (x, y), None).unwrap();
     }
 
-    pub fn semilogx(&self, x: &[f32], y: &[f32]) {
+    pub fn semilogx(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "semilogx", (x, y), None).unwrap();
     }
 
-    pub fn semilogy(&self, x: &[f32], y: &[f32]) {
+    pub fn semilogy(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "semilogy", (x, y), None).unwrap();
     }
 
-    pub fn pcolormesh(&mut self, x: &[f32], y: &[f32], z: &[f32], cmap: &str, title: &str) {
+    pub fn pcolormesh(&mut self, x: &[f64], y: &[f64], z: &[f64], cmap: &str, title: &str) {
         let subplots = PyDict::new(self.py);
         subplots.set_item(self.py, "figsize", (6, 6)).unwrap();
         subplots.set_item(self.py, "dpi", 100).unwrap();
@@ -144,7 +144,7 @@ impl<'p> Plot<'p> {
         self.artists.push(c);
     }
 
-    pub fn quiver(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32]) {
+    pub fn quiver(&mut self, x: &[f64], y: &[f64], u: &[f64], v: &[f64]) {
         let np_u = self.reshape(u, x.len(), y.len());
         let np_v = self.reshape(v, x.len(), y.len());
 
@@ -159,7 +159,7 @@ impl<'p> Plot<'p> {
         self.artists.push(q);
     }
 
-    pub fn streamplot(&mut self, x: &[f32], y: &[f32], u: &[f32], v: &[f32]) {
+    pub fn streamplot(&mut self, x: &[f64], y: &[f64], u: &[f64], v: &[f64]) {
         let np_u = self.reshape(u, x.len(), y.len());
         let np_v = self.reshape(v, x.len(), y.len());
 
@@ -185,7 +185,7 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn contourf(&mut self, x: &[f32], y: &[f32], z: &[f32], cmap: &str, title: &str) {
+    pub fn contourf(&mut self, x: &[f64], y: &[f64], z: &[f64], cmap: &str, title: &str) {
         let subplots = PyDict::new(self.py);
         subplots.set_item(self.py, "figsize", (6, 6)).unwrap();
         subplots.set_item(self.py, "dpi", 100).unwrap();
@@ -265,7 +265,7 @@ impl<'p> Plot<'p> {
             .unwrap();
     }
 
-    pub fn reshape(&self, values: &[f32], a: usize, b: usize) -> PyObject {
+    pub fn reshape(&self, values: &[f64], a: usize, b: usize) -> PyObject {
         self.np
             .call(self.py, "reshape", (values, (a, b)), None)
             .unwrap()
@@ -312,7 +312,7 @@ impl<'p> Animation<'p> {
             .unwrap();
     }
 
-    pub fn update_frame(&self, z: &[f32], _u: &[f32], _v: &[f32], x_len: usize, y_len: usize) {
+    pub fn update_frame(&self, z: &[f64], _u: &[f64], _v: &[f64], x_len: usize, y_len: usize) {
         let np_z = self.reshape(z, x_len, y_len);
         self.artists[0]
             .call_method(self.py, "set_data", (&np_z,), None)
@@ -336,7 +336,7 @@ impl<'p> Animation<'p> {
             .unwrap();
     }
 
-    pub fn reshape(&self, values: &[f32], a: usize, b: usize) -> PyObject {
+    pub fn reshape(&self, values: &[f64], a: usize, b: usize) -> PyObject {
         self.np
             .call(self.py, "reshape", (values, (a, b)), None)
             .unwrap()

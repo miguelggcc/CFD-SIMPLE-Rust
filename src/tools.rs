@@ -4,7 +4,7 @@ pub fn ix(i: usize, j: usize, width: usize) -> usize {
 }
 
 #[inline(always)]
-pub fn tridiagonal_solver(a: &[f32], b: &[f32], c: &mut [f32], d: &mut [f32]) {
+pub fn tridiagonal_solver(a: &[f64], b: &[f64], c: &mut [f64], d: &mut [f64]) {
     //a: Vector with range 1..n (index 0 is never read)
     //b: Vector with range 0..n
     //c: Vector with range 0..n-1

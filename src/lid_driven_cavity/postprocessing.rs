@@ -78,7 +78,7 @@ impl LidDrivenCavity {
         plot.save(export_path.join("ghia.png"));
         plot.clf();
 
-        let iter_axis: Vec<f32> = (0..iter).map(|i| i as f32).collect();
+        let iter_axis: Vec<f64> = (0..iter).map(|i| i as f64).collect();
         plot.semilogy(&iter_axis, &self.residuals.u);
         plot.semilogy(&iter_axis, &self.residuals.v);
         plot.semilogy(&iter_axis, &self.residuals.pressure);

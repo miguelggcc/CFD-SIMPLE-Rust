@@ -8,15 +8,15 @@ impl LidDrivenCavity {
 
         #[inline(always)]
         fn pwim(
-            vel: &[f32],
-            a_0: &[f32],
-            dpdx_0: f32,
-            dpdx_other: f32,
-            dpdx_face: f32,
+            vel: &[f64],
+            a_0: &[f64],
+            dpdx_0: f64,
+            dpdx_other: f64,
+            dpdx_face: f64,
             index: usize,
             index_other: usize,
-            d: f32,
-        ) -> f32 {
+            d: f64,
+        ) -> f64 {
             0.5 * (vel[index] + vel[index_other])
                 + 0.5
                     * (dpdx_0 / a_0[index] + dpdx_other / a_0[index_other]
@@ -326,8 +326,8 @@ impl LidDrivenCavity {
 
 #[derive(Clone, Default)]
 pub struct Faces {
-    pub u_e: f32,
-    pub u_w: f32,
-    pub v_n: f32,
-    pub v_s: f32,
+    pub u_e: f64,
+    pub u_w: f64,
+    pub v_n: f64,
+    pub v_s: f64,
 }

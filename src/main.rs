@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
 
-    //case.postprocessing(iter);
+    case.postprocessing(iter);
 
     Ok(())
 }
