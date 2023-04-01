@@ -1,8 +1,8 @@
 use crate::tools::{ix, tridiagonal_solver};
 
-use super::{LidDrivenCavity, Links};
+use super::{Links, PipeFlow};
 
-impl LidDrivenCavity {
+impl PipeFlow {
     pub fn solver_correction(
         &self,
         x: &mut [f64],

@@ -1,8 +1,8 @@
 use crate::tools::ix;
 
-use super::LidDrivenCavity;
+use super::PipeFlow;
 
-impl LidDrivenCavity {
+impl PipeFlow {
     pub fn correct_cell_velocities(&mut self) {
         let n = self.nx;
         //------u velocity------------------
@@ -30,8 +30,8 @@ impl LidDrivenCavity {
         for j in 0..self.ny {
             let a_0 = self.a_0[ix(i, j, n)];
             self.u[ix(i, j, n)] +=
-                self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i, j, n)]) * self.dy
-                    / a_0; //(pw+p0)/2 - p0
+                self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
+                    / a_0;
         }
 
         //------v velocity------------------
@@ -107,6 +107,8 @@ impl LidDrivenCavity {
             let a_0w = self.a_0[ix(i - 1, j, n)];
 
             let f = self.faces.get_mut(ix(i, j, n)).unwrap();
+
+            f.u_e = self.u[ix(i, j, n)];
 
             f.u_w +=
                 self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i, j, n)]) * self.dy

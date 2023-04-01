@@ -1,16 +1,15 @@
 use crate::tools::{ix, tridiagonal_solver};
 
-use super::{LidDrivenCavity, Links};
+use super::{Links, PipeFlow};
 
-impl LidDrivenCavity {
-    pub fn solver_correction(
+impl PipeFlow {
+    pub fn solver(
         &self,
         x: &mut [f64],
         a_0: &[f64],
         links: &[Links],
         sources: &[f64],
         iter: usize,
-        dumping: f64,
     ) {
         let n = self.nx;
         let mut diagonal = vec![0.0; self.nx.max(self.ny)];
@@ -24,23 +23,19 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = a_0[ix(i, j, n)];
             cx[i] = l.a_e;
             rhs[i] = -l.a_n * x[ix(i, j + 1, n)] + sources[ix(i, j, n)];
-            rhs[i] += -l.a_e * x[ix(i + 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             //Bottom wall
             let j = 0;
 
             for i in 1..self.nx - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = a_0[ix(i, j, n)];
                 ax[i] = l.a_w;
                 cx[i] = l.a_e;
                 rhs[i] = -l.a_n * x[ix(i, j + 1, n)] + sources[ix(i, j, n)];
-                rhs[i] += -l.a_e * x[ix(i + 1, j, n)]
-                    - l.a_w * x[ix(i - 1, j, n)]
-                    - a_0[ix(i, j, n)] * x[ix(i, j, n)];
             }
 
             //Bottom right corner
@@ -48,10 +43,9 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = a_0[ix(i, j, n)];
             ax[i] = l.a_w;
             rhs[i] = -l.a_n * x[ix(i, j + 1, n)] + sources[ix(i, j, n)];
-            rhs[i] += -l.a_w * x[ix(i - 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             tridiagonal_solver(&ax, &diagonal, &mut cx, &mut rhs, self.nx);
 
@@ -62,35 +56,30 @@ impl LidDrivenCavity {
                 let i = 0;
 
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = a_0[ix(i, j, n)];
                 cx[i] = l.a_e;
                 rhs[i] =
                     -l.a_n * x[ix(i, j + 1, n)] - l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
-                rhs[i] += -l.a_e * x[ix(i + 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
                 //Interior nodes
 
                 for i in 1..self.nx - 1 {
                     let l = &links[ix(i, j, n)];
-                    diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                    diagonal[i] = a_0[ix(i, j, n)];
                     ax[i] = l.a_w;
                     cx[i] = l.a_e;
                     rhs[i] = -l.a_n * x[ix(i, j + 1, n)] - l.a_s * x[ix(i, j - 1, n)]
                         + sources[ix(i, j, n)];
-                    rhs[i] += -l.a_e * x[ix(i + 1, j, n)]
-                        - l.a_w * x[ix(i - 1, j, n)]
-                        - a_0[ix(i, j, n)] * x[ix(i, j, n)];
                 }
 
                 //Right wall
                 let i = self.nx - 1;
 
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = a_0[ix(i, j, n)];
                 ax[i] = l.a_w;
                 rhs[i] =
                     -l.a_n * x[ix(i, j + 1, n)] - l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
-                rhs[i] += -l.a_w * x[ix(i - 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
                 tridiagonal_solver(&ax, &diagonal, &mut cx, &mut rhs, self.nx);
 
@@ -102,23 +91,19 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = a_0[ix(i, j, n)];
             cx[i] = l.a_e;
             rhs[i] = -l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
-            rhs[i] += -l.a_e * x[ix(i + 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             //Top wall
             let j = self.ny - 1;
 
             for i in 1..self.nx - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = a_0[ix(i, j, n)];
                 ax[i] = l.a_w;
                 cx[i] = l.a_e;
                 rhs[i] = -l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
-                rhs[i] += -l.a_e * x[ix(i + 1, j, n)]
-                    - l.a_w * x[ix(i - 1, j, n)]
-                    - a_0[ix(i, j, n)] * x[ix(i, j, n)];
             }
 
             //Top right corner
@@ -126,10 +111,9 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = a_0[ix(i, j, n)];
             ax[i] = l.a_w;
             rhs[i] = -l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
-            rhs[i] += -l.a_w * x[ix(i - 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             tridiagonal_solver(&ax, &diagonal, &mut cx, &mut rhs, self.nx);
 
@@ -142,23 +126,19 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = a_0[ix(i, j, n)];
             cx[j] = l.a_n;
             rhs[j] = -l.a_e * x[ix(i + 1, j, n)] + sources[ix(i, j, n)];
-            rhs[j] += -l.a_n * x[ix(i, j + 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             //Left wall
             let i = 0;
 
             for j in 1..self.ny - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = a_0[ix(i, j, n)];
                 ax[j] = l.a_s;
                 cx[j] = l.a_n;
                 rhs[j] = -l.a_e * x[ix(i + 1, j, n)] + sources[ix(i, j, n)];
-                rhs[j] += -l.a_n * x[ix(i, j + 1, n)]
-                    - l.a_s * x[ix(i, j - 1, n)]
-                    - a_0[ix(i, j, n)] * x[ix(i, j, n)];
             }
 
             //Top left corner
@@ -166,10 +146,9 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = a_0[ix(i, j, n)];
             ax[j] = l.a_s;
             rhs[j] = -l.a_e * x[ix(i + 1, j, n)] + sources[ix(i, j, n)];
-            rhs[j] += -l.a_s * x[ix(i, j - 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             tridiagonal_solver(&ax, &diagonal, &mut cx, &mut rhs, self.ny);
 
@@ -181,34 +160,29 @@ impl LidDrivenCavity {
                 let j = 0;
 
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = a_0[ix(i, j, n)];
                 cx[j] = l.a_n;
                 rhs[j] =
                     -l.a_e * x[ix(i + 1, j, n)] - l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
-                rhs[j] += -l.a_n * x[ix(i, j + 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
                 //Interior nodes
 
                 for j in 1..self.ny - 1 {
                     let l = &links[ix(i, j, n)];
-                    diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                    diagonal[j] = a_0[ix(i, j, n)];
                     ax[j] = l.a_s;
                     cx[j] = l.a_n;
                     rhs[j] = -l.a_e * x[ix(i + 1, j, n)] - l.a_w * x[ix(i - 1, j, n)]
                         + sources[ix(i, j, n)];
-                    rhs[j] += -l.a_n * x[ix(i, j + 1, n)]
-                        - l.a_s * x[ix(i, j - 1, n)]
-                        - a_0[ix(i, j, n)] * x[ix(i, j, n)];
                 }
 
                 //Top wall
                 let j = self.ny - 1;
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = a_0[ix(i, j, n)];
                 ax[j] = l.a_s;
                 rhs[j] =
                     -l.a_e * x[ix(i + 1, j, n)] - l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
-                rhs[j] += -l.a_s * x[ix(i, j - 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
                 tridiagonal_solver(&ax, &diagonal, &mut cx, &mut rhs, self.ny);
 
@@ -220,23 +194,19 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = a_0[ix(i, j, n)];
             cx[j] = l.a_n;
             rhs[j] = -l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
-            rhs[j] += -l.a_n * x[ix(i, j + 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             //Right wall
             let i = self.nx - 1;
 
             for j in 1..self.ny - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = a_0[ix(i, j, n)];
                 ax[j] = l.a_s;
                 cx[j] = l.a_n;
                 rhs[j] = -l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
-                rhs[j] += -l.a_n * x[ix(i, j + 1, n)]
-                    - l.a_s * x[ix(i, j - 1, n)]
-                    - a_0[ix(i, j, n)] * x[ix(i, j, n)];
             }
 
             //Top right corner
@@ -244,10 +214,9 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = a_0[ix(i, j, n)];
             ax[j] = l.a_s;
             rhs[j] = -l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
-            rhs[j] += -l.a_s * x[ix(i, j - 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
 
             tridiagonal_solver(&ax, &diagonal, &mut cx, &mut rhs, self.ny);
 
@@ -259,13 +228,13 @@ impl LidDrivenCavity {
 #[inline(always)]
 fn replace_row(row: usize, x: &mut [f64], solx: &[f64], nx: usize) {
     for i in 0..nx {
-        x[ix(i, row, nx)] += solx[i];
+        x[ix(0, row, nx)..ix(nx, row, nx)].copy_from_slice(&solx[0..nx]);
     }
 }
 
 #[inline(always)]
 fn replace_column(column: usize, x: &mut [f64], soly: &[f64], nx: usize, ny: usize) {
     for j in 0..ny {
-        x[ix(column, j, nx)] += soly[j];
+        x[ix(column, j, nx)] = soly[j];
     }
 }

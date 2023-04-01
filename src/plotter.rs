@@ -115,9 +115,6 @@ impl<'p> Plot<'p> {
         dict.set_item(self.py, "cmap", cmap).unwrap();
         dict.set_item(self.py, "animated", "True").unwrap();
 
-        dict.set_item(self.py, "vmin", 0.0).unwrap();
-        dict.set_item(self.py, "vmax", 1.0).unwrap();
-
         let c = ax
             .call_method(
                 self.py,
@@ -164,7 +161,8 @@ impl<'p> Plot<'p> {
         let np_v = self.reshape(v, x.len(), y.len());
 
         let dictq = PyDict::new(self.py);
-        dictq.set_item(self.py, "density", 3.0).unwrap();
+        dictq.set_item(self.py, "density", 1.0).unwrap();
+        dictq.set_item(self.py, "color", "w").unwrap();
 
         let list = PyList::extract(
             self.py,
@@ -213,7 +211,7 @@ impl<'p> Plot<'p> {
 
         let dict2 = PyDict::new(self.py);
         dict2.set_item(self.py, "ax", ax).unwrap();
-        dict2.set_item(self.py, "fraction", 0.046).unwrap();
+        dict2.set_item(self.py, "fraction", 0.016).unwrap();
         dict2.set_item(self.py, "pad", 0.04).unwrap();
         fig.call_method(self.py, "tight_layout", NoArgs, None)
             .unwrap();
@@ -267,7 +265,7 @@ impl<'p> Plot<'p> {
 
     pub fn reshape(&self, values: &[f64], a: usize, b: usize) -> PyObject {
         self.np
-            .call(self.py, "reshape", (values, (a, b)), None)
+            .call(self.py, "reshape", (values, (b, a)), None)
             .unwrap()
     }
 }
