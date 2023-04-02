@@ -1,70 +1,16 @@
-# CFD-Rust
-I'll try to create that. Here is a possible GitHub readme for your project:
+# SIMPLE algorithm based CFD solver in Rust
 
-# CFD Solver in Rust
-
-This project is a computational fluid dynamics (CFD) solver written in Rust, using the SIMPLE algorithm with a collocated mesh. It can solve three cases: the lid-driven cavity flow, the pipe flow with a velocity inlet and a gauge pressure outlet, and the backward facing step flow.
-
-## Installation
-
-To run this project, you need to have Rust and Cargo installed on your system. You can download them from https://www.rust-lang.org/tools/install.
-
-To install the dependencies, run:
-
-```bash
-cargo build
-```
+This project is a computational fluid dynamics (CFD) solver written in Rust and post-processed in Python, using the SIMPLE algorithm with a collocated grid in which  all flow variables are stored at the same locations. This project is based on the [lectures by Dr. Sandip Mazumder](https://youtube.com/playlist?list=PLVuuXJfoPgT4gJcBAAFPW7uMwjFKB9aqT). It can solve three cases: the lid-driven cavity flow, the pipe flow with a velocity inlet and a gauge pressure outlet, and the backward facing step flow.
 
 ## Usage
 
-To run the solver for a specific case, use the following command:
+To run this project, you need to have Rust and Python 3 installed on your system. To run the solver for a specific case, use the following command:
 
 ```bash
-cargo run --release --bin <case>
+cargo run --release -- -c <case>
 ```
 
-where `<case>` can be one of `cavity`, `pipe`, or `step`.
-
-The solver will output the velocity and pressure fields in CSV files in the `output` folder.
-
-To visualize the results, you can use any plotting tool of your choice. For example, you can use Python and Matplotlib with the following script:
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Load the data
-u = np.loadtxt("output/u.csv", delimiter=",")
-v = np.loadtxt("output/v.csv", delimiter=",")
-p = np.loadtxt("output/p.csv", delimiter=",")
-
-# Define the grid
-nx = u.shape[0]
-ny = u.shape[1]
-dx = 1 / (nx - 1)
-dy = 1 / (ny - 1)
-x = np.linspace(0, 1, nx)
-y = np.linspace(0, 1, ny)
-X, Y = np.meshgrid(x, y)
-
-# Plot the velocity field
-plt.figure()
-plt.quiver(X, Y, u, v)
-plt.xlabel("x")
-plt.ylabel("y")
-plt.title("Velocity field")
-
-# Plot the pressure field
-plt.figure()
-plt.contourf(X, Y, p)
-plt.xlabel("x")
-plt.ylabel("y")
-plt.title("Pressure field")
-plt.colorbar()
-
-# Show the plots
-plt.show()
-```
+where `<case>` can be one of `lid_driven_cavity`, `pipe_flow`, `backward_facing_step`. The solver uses a uniform mesh of size $n_x \times n_y$, which can be specified by the user. The solver also uses a time step $\Delta t$ and a maximum number of iterations $N_{iter}$ given by the user.
 
 ## Lid-driven cavity flow
 
@@ -84,16 +30,6 @@ u = 1,\ v = 0 \quad \text{at} \quad y = 1 \\
 u = 0,\ v = 0 \quad \text{at} \quad x = 0,\ x = 1,\ y = 0
 $$
 
-The Reynolds number based on the cavity height is defined as:
-
-$$
-Re = \frac{UL}{\nu}
-$$
-
-where $U$ is the lid velocity and $L$ is the cavity height.
-
-The solver uses a uniform mesh of size $N_x \times N_y$, where $N_x$ and $N_y$ are specified by the user. The solver also uses a time step $\Delta t$ and a maximum number of iterations $N_{iter}$ given by the user.
-
 The solver implements the SIMPLE algorithm with a collocated mesh, which consists of the following steps:
 
 1. Guess an initial pressure field $p^0$ and set $n=0$.
@@ -101,15 +37,6 @@ The solver implements the SIMPLE algorithm with a collocated mesh, which consist
 
 $$
 \frac{\mathbf{u}^* - \mathbf{u}^n}{\Delta t} + (\mathbf{u}^n \cdot \nabla) \mathbf{u}^n = -\frac{1}{\rho} \nabla p^n + \nu \nabla
-
-Origen: Conversación con Bing, 2/4/2023(1) msakuta/cfd-wasm: Computational Fluid Dynamics in Wasm with Rust - GitHub. https://github.com/msakuta/cfd-wasm Con acceso 2/4/2023.
-(2) GitHub - f4try/tutorials_rust_cfd: Tutorials for CFD in rust. https://github.com/f4try/tutorials_rust_cfd Con acceso 2/4/2023.
-(3) Crypto Finance Development Kit for Rust (CFD-RUST) - GitHub. https://github.com/p2pderivatives/cfd-rust Con acceso 2/4/2023.
-(4) 2.1 Lid-driven cavity flow - OpenFOAM. https://www.openfoam.com/documentation/tutorial-guide/2-incompressible-flow/2.1-lid-driven-cavity-flow Con acceso 2/4/2023.
-(5) Lid Driven Cavity Background - NVIDIA Docs. https://docs.nvidia.com/deeplearning/modulus/text/basics/lid_driven_cavity_flow.html Con acceso 2/4/2023.
-(6) Introductory Example - NVIDIA Docs. https://docs.nvidia.com/deeplearning/modulus/user_guide/basics/lid_driven_cavity_flow.html Con acceso 2/4/2023.
-
-Sure, I'll continue the readme:
 
 3. Solve the pressure correction equation for $p'$ using an implicit scheme:
 
@@ -126,15 +53,6 @@ $$
 
 5. Check the convergence criteria based on the residuals of the momentum and continuity equations. If not converged, set $n = n + 1$ and go back to step 2.
 
-The solver outputs the velocity and pressure fields at each time step in CSV files in the `output` folder. The solver also prints the residuals and the Courant number at each time step.
-
-## References
-
-- [2.1 Lid-driven cavity flow - OpenFOAM](https://www.openfoam.com/documentation/tutorial-guide/2-incompressible-flow/2.1-lid-driven-cavity-flow)
-- [Lid Driven Cavity Background - NVIDIA Docs](https://docs.nvidia.com/deeplearning/modulus/text/basics/lid_driven_cavity_flow.html)
-- [Introductory Example - NVIDIA Docs](https://docs.nvidia.com/deeplearning/modulus/user_guide/basics/lid_driven_cavity_flow.html)
-
-Okay, I'll continue the readme:
 
 ## Pipe flow
 
@@ -156,14 +74,7 @@ $$
 Re = \frac{U_{in} H}{\nu}
 $$
 
-The solver uses a uniform mesh of size $N_x \times N_y$, where $N_x$ and $N_y$ are specified by the user. The solver also uses a time step $\Delta t$ and a maximum number of iterations $N_{iter}$ given by the user.
-
 The solver implements the same SIMPLE algorithm with a collocated mesh as the lid-driven cavity flow.
-
-The solver outputs the velocity and pressure fields at each time step in CSV files in the `output` folder. The solver also prints the residuals and the Courant number at each time step.
-Sure, I'll write something about that. Here is a possible paragraph to add to the readme:
-
-## Validation
 
 To validate the results of the pipe flow solver, we compare them with the analytical solution of the Poiseuille flow, which is a special case of the pipe flow with no-slip boundary conditions at the top and bottom walls. The analytical solution for the velocity profile and the pressure drop are given by:
 
