@@ -11,7 +11,7 @@ cargo run --release -- -c <case>
 ```
 
 where `<case>` can be one of `lid_driven_cavity`, `pipe_flow`, `backward_facing_step`. The solver uses a uniform mesh of size $n_x \times n_y$, which can be specified by the user. The solver also uses a time step $\Delta t$ and a maximum number of iterations $N_{iter}$ given by the user.
-
+To get information about what variables you can change in the solver, you can use the --help or -h flag
 ## Lid-driven cavity flow
 
 The lid-driven cavity flow is a classic benchmark problem for CFD. It consists of a square domain with all the boundaries being solid walls. The top wall moves in the x-direction at a constant speed while the other walls are stationary. The flow is governed by the incompressible Navier-Stokes equations:
