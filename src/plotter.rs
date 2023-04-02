@@ -275,12 +275,3 @@ impl<'p> Plot<'p> {
             .unwrap()
     }
 }
-
-pub struct Animation<'p> {
-    py: Python<'p>,
-    plt: PyModule,
-    plot: Plot<'p>,
-    np: PyModule,
-    writer: PyObject,
-    artists: Vec<PyObject>,
-}
