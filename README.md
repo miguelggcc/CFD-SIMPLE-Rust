@@ -10,8 +10,8 @@ To run this project, you need to have Rust and Python 3 installed on your system
 cargo run --release -- -c <case>
 ```
 
-where `<case>` can be one of `lid_driven_cavity`, `pipe_flow`, `backward_facing_step`. The solver uses a uniform mesh of size $n_x \times n_y$, which can be specified by the user. The solver also uses a time step $\Delta t$ and a maximum number of iterations $N_{iter}$ given by the user.
-To get information about what variables you can change in the solver, you can use the --help or -h flag
+where `<case>` can be one of `lid_driven_cavity`, `pipe_flow`, `backward_facing_step`. The solver uses a uniform mesh of size $n_x \times n_y$, which can be specified by the user. To get information about what variables you can change in the solver, you can use the `--help` or `-h` flag.
+
 ## Lid-driven cavity flow
 
 The lid-driven cavity flow is a classic benchmark problem for CFD. It consists of a square domain with all the boundaries being solid walls. The top wall moves in the x-direction at a constant speed while the other walls are stationary. The flow is governed by the incompressible Navier-Stokes equations:
@@ -56,9 +56,10 @@ $$
 To validate the results of the lid-driven cavity flow solver, we compare them with the experimental results of Ghia et al. [^1] for Reynolds number 100.
 
 ### Results
-
-![Lid-driven cavity flow u-velocity validation](images/cavity_u_validation.png)
-![Lid-driven cavity flow v-velocity validation](images/cavity_v_validation.png)
+![velocity_m](https://user-images.githubusercontent.com/100235899/229377769-c678d206-57b4-490d-be1c-7f23985b3fe1.png)
+![residuals](https://user-images.githubusercontent.com/100235899/229377781-3fa8f610-eff3-400a-87e2-779cc5ab3fd9.png)
+![ghia](https://user-images.githubusercontent.com/100235899/229377785-288878e7-f831-412a-93c9-298fc458671d.png)
+![velocity_m](https://user-images.githubusercontent.com/100235899/229377966-760cac88-bfd7-4ad6-bcd7-805a0f285b8f.png)
 
 ## Pipe flow
 
@@ -89,21 +90,17 @@ u(y) = \frac{1}{2 \mu} \frac{dp}{dx} (H^2/4 - y^2) \\
 \Delta p = -\frac{8 \mu U_{in} L}{H^2}
 $$
 
-where $\mu$ is the dynamic viscosity, $dp/dx$ is the pressure gradient, $H$ is the height of the domain, $U_{in}$ is the inlet velocity, and $L$ is the length of the domain.
+where $\mu$ is the dynamic viscosity, $dp/dx$ is the pressure gradient, $H$ is the height of the domain, $U_{in}$ is the inlet velocity, and $L$ is the length of the domain. The figures show a good agreement between the numerical and analytical solutions, confirming the accuracy of the solver.
 
-We plot the numerical and analytical solutions for the velocity profile at $x = L/2$ and the pressure drop along the domain. The figures show a good agreement between the numerical and analytical solutions, confirming the accuracy of the solver.
-
-![Pipe flow velocity validation](images/pipe_velocity_validation.png)
-![Pipe flow pressure validation](images/pipe_pressure_validation.png)
-
-Origen: Conversación con Bing, 2/4/2023(1) Exact analytical solutions for the Poiseuille and Couette–Poiseuille .... https://www.sciencedirect.com/science/article/pii/S1007570411004059 Con acceso 2/4/2023.
-(2) Analytical solution of the poiseuille flow problem using the .... https://link.springer.com/article/10.1134/S0021894412040050 Con acceso 2/4/2023.
-(3) A full analytical solution for the force-driven compressible Poiseuille .... https://aip.scitation.org/doi/10.1063/1.3540671 Con acceso 2/4/2023.
-Alright, I'll continue the readme:
+### Results
+![u](https://user-images.githubusercontent.com/100235899/229377925-5450b28c-307b-47d7-b3f2-a725b53f1ac1.png)
+![residuals](https://user-images.githubusercontent.com/100235899/229377933-2c9f70ce-9328-4034-9a8f-3bc24ec8a405.png)
+![u_profile](https://user-images.githubusercontent.com/100235899/229377937-ba8cd109-ecf9-4162-8769-348b3c6cca2c.png)
+![p_drop](https://user-images.githubusercontent.com/100235899/229377941-23c1eab2-6f6e-462b-a57f-28bcc33967c4.png)
 
 ## Backward facing step flow
 
-The backward facing step flow is a more complex problem for CFD. It consists of a rectangular domain with a step at the bottom wall. The flow is governed by the same incompressible Navier-Stokes equations as the lid-driven cavity flow and the pipe flow.
+The backward facing step flow is a more complex problem for CFD. It consists of a rectangular domain with a step at the bottom wall.
 
 The boundary conditions are:
 
@@ -124,11 +121,14 @@ $$
 Re = \frac{U_{in} H_1}{\nu}
 $$
 
-The solver uses a uniform mesh of size $N_x \times N_y$, where $N_x$ and $N_y$ are specified by the user. The solver also uses a time step $\Delta t$ and a maximum number of iterations $N_{iter}$ given by the user.
+### Results
+![velocity_m](https://user-images.githubusercontent.com/100235899/229378653-89ebd29d-b123-46a6-a00d-f7837e24ad50.png)
+![residuals](https://user-images.githubusercontent.com/100235899/229378657-5a16376b-d7bf-41fb-a7a9-a8ea1ff8f2e8.png)
 
-The solver implements the same SIMPLE algorithm with a collocated mesh as the lid-driven cavity flow and the pipe flow.
-
-The solver outputs the velocity and pressure fields at each time step in CSV files in the `output` folder. The solver also prints the residuals and the Courant number at each time step.
+![velocity_m](https://user-images.githubusercontent.com/100235899/229378063-14a6db9d-a107-4109-83c6-11c89d138332.png)
+![residuals](https://user-images.githubusercontent.com/100235899/229378087-fa05128d-50a4-43b5-ab9c-b22608cf1952.png)
+![velocity_m](https://user-images.githubusercontent.com/100235899/229378559-de2ab640-d964-4823-8383-461a96f2b825.png)
+![residuals](https://user-images.githubusercontent.com/100235899/229378566-af9966fd-57dc-4f04-a281-2cd263b05ec1.png)
 
 
 [^1] U. Ghia, K. N. Ghia, and C. T. Shin, "High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method," Journal of Computational Physics, vol. 48, no. 3, pp. 387-411, 1982.
