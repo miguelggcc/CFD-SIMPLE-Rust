@@ -14,7 +14,7 @@ where `<case>` can be one of `lid_driven_cavity`, `pipe_flow`, `backward_facing_
 
 ## Lid-driven cavity flow
 
-The lid-driven cavity flow is a classic benchmark problem for CFD. It consists of a square domain with all the boundaries being walls. The top wall moves in the x-direction at a constant speed while the other walls are stationary. The flow is governed by the incompressible Navier-Stokes equations:
+The lid-driven cavity flow is a classic benchmark problem for CFD. It consists of a square domain with all the boundaries being solid walls. The top wall moves in the x-direction at a constant speed while the other walls are stationary. The flow is governed by the incompressible Navier-Stokes equations:
 
 $$
 \nabla \cdot \mathbf{u} = 0 \\
@@ -53,23 +53,13 @@ $$
 
 5. Check the convergence criteria based on the residuals of the momentum and continuity equations. If not converged, set $n = n + 1$ and go back to step 2.
 
-Sure, I'll write something about that. Here is a possible paragraph to add to the readme:
+To validate the results of the lid-driven cavity flow solver, we compare them with the experimental results of Ghia et al. [^1] for Reynolds number 100.
 
-## Validation
-
-To validate the results of the lid-driven cavity flow solver, we compare them with the experimental results of Ghia et al. [1], who measured the velocity profiles along the vertical and horizontal centerlines of the cavity for Reynolds number 100. The numerical solution is obtained using a uniform mesh of size 129 x 129 and a time step of 0.001.
-
-We plot the numerical and experimental solutions for the u-velocity along the vertical centerline and the v-velocity along the horizontal centerline. The figures show a good agreement between the numerical and experimental solutions, confirming the accuracy of the solver.
+### Results
 
 ![Lid-driven cavity flow u-velocity validation](images/cavity_u_validation.png)
 ![Lid-driven cavity flow v-velocity validation](images/cavity_v_validation.png)
 
-[1] U. Ghia, K. N. Ghia, and C. T. Shin, "High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method," Journal of Computational Physics, vol. 48, no. 3, pp. 387-411, 1982.
-
-Origen: Conversación con Bing, 2/4/2023(1) (PDF) The Lid-Driven Cavity - ResearchGate. https://www.researchgate.net/publication/324413434_The_Lid-Driven_Cavity Con acceso 2/4/2023.
-(2) Revisiting the lid-driven cavity flow problem: Review and new steady .... https://www.sciencedirect.com/science/article/pii/S1110016816302800 Con acceso 2/4/2023.
-(3) Lid-driven cubical cavity geometry. | Download Scientific Diagram. https://www.researchgate.net/figure/Lid-driven-cubical-cavity-geometry_fig1_267995227 Con acceso 2/4/2023.
-(4) Lid driven cavity at Re=100. Reference solution by Ghia et al. [64] and .... https://www.researchgate.net/figure/Lid-driven-cavity-at-Re100-Reference-solution-by-Ghia-et-al-64-and-numerical_fig2_285458775 Con acceso 2/4/2023.
 ## Pipe flow
 
 The pipe flow is another benchmark problem for CFD. It consists of a rectangular domain with a velocity inlet at the left boundary and a gauge pressure outlet at the right boundary. The flow is governed by the same incompressible Navier-Stokes equations as the lid-driven cavity flow.
@@ -139,3 +129,6 @@ The solver uses a uniform mesh of size $N_x \times N_y$, where $N_x$ and $N_y$ a
 The solver implements the same SIMPLE algorithm with a collocated mesh as the lid-driven cavity flow and the pipe flow.
 
 The solver outputs the velocity and pressure fields at each time step in CSV files in the `output` folder. The solver also prints the residuals and the Courant number at each time step.
+
+
+[^1] U. Ghia, K. N. Ghia, and C. T. Shin, "High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method," Journal of Computational Physics, vol. 48, no. 3, pp. 387-411, 1982.
