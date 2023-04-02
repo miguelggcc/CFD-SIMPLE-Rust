@@ -25,7 +25,7 @@ pub struct BackwardFacingStep {
     pub nu: f64,
     pub rho: f64,
     pub relax_uv: f64,
-    pub relax_p: f64, //For Re = 200, set to 0.01
+    pub relax_p: f64, //For Re = 200, set to 0.03
     pub damping: f64, //For Re = 200, set dumping to 0.6
     pub x: Vec<f64>,
     pub y: Vec<f64>,
@@ -145,7 +145,7 @@ impl Case for BackwardFacingStep {
         self.get_links_pressure_correction();
 
         self.save_pressure_residual();
-        
+
         let mut pc = vec![0.0; self.ny * self.nx];
         self.solver_correction(&mut pc, &self.a_p0, &self.plinks, &self.source_p, 20, 0.0);
         self.pc = pc;
