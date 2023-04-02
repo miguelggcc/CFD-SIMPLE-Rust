@@ -71,8 +71,6 @@ $$
 Re = \frac{U_{in} H}{\nu}
 $$
 
-The solver implements the same SIMPLE algorithm with a collocated mesh as the lid-driven cavity flow.
-
 To validate the results of the pipe flow solver, we compare them with the analytical solution of the Poiseuille flow, which is a special case of the pipe flow with no-slip boundary conditions at the top and bottom walls. The analytical solution for the velocity profile and the pressure drop are given by:
 
 $$
