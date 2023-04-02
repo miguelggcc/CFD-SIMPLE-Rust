@@ -23,6 +23,7 @@ pub struct LidDrivenCavity {
     pub rho: f64,
     pub relax_uv: f64,
     pub relax_p: f64,
+    pub damping: f64,
     pub x: Vec<f64>,
     pub y: Vec<f64>,
     pub links: Vec<Links>,
@@ -41,28 +42,25 @@ pub struct LidDrivenCavity {
 }
 
 impl LidDrivenCavity {
-    pub fn new(nx: usize, ny: usize, re: f64) -> Self {
+    pub fn new(nx: usize, ny: usize, re: f64, relax_uv: f64, relax_p: f64, damping: f64) -> Self {
         let dx = 1.0 / (nx as f64);
         let dy = 1.0 / (ny as f64);
         let x = linspace::<f64>(0.0, 1.0, nx).collect();
         let y = linspace::<f64>(0.0, 1.0, ny).collect();
-        let u = vec![0.0; nx * ny];
+        let u = vec![0.0; ny * nx];
 
-        let v = vec![0.0; nx * ny];
-        let p = vec![0.0; nx * ny];
-        let pc = vec![0.0; nx * ny];
-        let links = vec![Links::default(); nx * ny];
+        let v = vec![0.0; ny * nx];
+        let p = vec![0.0; ny * nx];
+        let pc = vec![0.0; ny * nx];
+        let links = vec![Links::default(); ny * nx];
         let plinks = links.clone();
-        let source_x = vec![0.0; nx * ny];
+        let source_x = vec![0.0; ny * nx];
         let source_y = source_x.clone();
         let source_p = source_x.clone();
-        let a_0 = vec![0.0; nx * ny];
+        let a_0 = vec![0.0; ny * nx];
         let a_p0 = a_0.clone();
         let faces = vec![Faces::default(); ny * nx];
         let residuals = Residuals::default();
-
-        let relax_uv = 0.8;
-        let relax_p = 0.1;
 
         Self {
             nx,
@@ -76,6 +74,7 @@ impl LidDrivenCavity {
             v,
             relax_uv,
             relax_p,
+            damping,
             x,
             y,
             links,
@@ -93,37 +92,57 @@ impl LidDrivenCavity {
     }
 }
 impl Case for LidDrivenCavity {
-    fn iterate(&mut self) -> bool {
+    fn iterate(&mut self) {
         self.get_links_momentum();
 
         self.save_u_residual();
         let mut u = std::mem::take(&mut self.u);
-        self.solver_correction(&mut u, &self.a_0, &self.links, &self.source_x, 4, 0.2);
+        self.solver_correction(
+            &mut u,
+            &self.a_0,
+            &self.links,
+            &self.source_x,
+            2,
+            self.damping,
+        );
         self.u = u;
 
         self.save_v_residual();
         let mut v = std::mem::take(&mut self.v);
-        self.solver_correction(&mut v, &self.a_0, &self.links, &self.source_y, 4, 0.2);
+        self.solver_correction(
+            &mut v,
+            &self.a_0,
+            &self.links,
+            &self.source_y,
+            2,
+            self.damping,
+        );
         self.v = v;
 
         self.get_face_velocities();
         self.get_links_pressure_correction();
 
         self.save_pressure_residual();
-        self.pc = vec![0.0; self.nx * self.ny];
-        let mut pc = std::mem::take(&mut self.pc);
+        
+        let mut pc = vec![0.0; self.ny * self.nx];
         self.solver(&mut pc, &self.a_p0, &self.plinks, &self.source_p, 20);
         self.pc = pc;
-        dbg!(self.pc.iter().fold(0.0, |acc, x| acc + x.abs()));
 
         self.correct_cell_velocities();
         self.correct_face_velocities();
         self.correct_pressure();
 
-        !self.u.iter().fold(0.0, |acc, x| acc + x.abs()).is_nan()
+        self.residuals.print();
     }
 
-    fn postprocessing(&self, plot: &mut crate::plotter::Plot<'_>, iter: usize) {
+    fn has_converged(&self, epsilon: f64) -> bool {
+        self.residuals.have_converged(epsilon)
+    }
+    fn has_diverged(&self) -> bool {
+        self.u.iter().fold(0.0, |acc, x| acc + x.abs()).is_nan()
+    }
+
+    fn postprocessing(&self, plot: &mut crate::plotter::Plot<'_>, iter: u32) {
         self.plot(plot, iter);
     }
 }

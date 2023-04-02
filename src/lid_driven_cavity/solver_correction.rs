@@ -10,7 +10,7 @@ impl LidDrivenCavity {
         links: &[Links],
         sources: &[f64],
         iter: usize,
-        dumping: f64,
+        damping: f64,
     ) {
         let n = self.nx;
         let mut diagonal = vec![0.0; self.nx.max(self.ny)];
@@ -24,7 +24,7 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
             cx[i] = l.a_e;
             rhs[i] = -l.a_n * x[ix(i, j + 1, n)] + sources[ix(i, j, n)];
             rhs[i] += -l.a_e * x[ix(i + 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -34,7 +34,7 @@ impl LidDrivenCavity {
 
             for i in 1..self.nx - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
                 ax[i] = l.a_w;
                 cx[i] = l.a_e;
                 rhs[i] = -l.a_n * x[ix(i, j + 1, n)] + sources[ix(i, j, n)];
@@ -48,7 +48,7 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
             ax[i] = l.a_w;
             rhs[i] = -l.a_n * x[ix(i, j + 1, n)] + sources[ix(i, j, n)];
             rhs[i] += -l.a_w * x[ix(i - 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -62,7 +62,7 @@ impl LidDrivenCavity {
                 let i = 0;
 
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
                 cx[i] = l.a_e;
                 rhs[i] =
                     -l.a_n * x[ix(i, j + 1, n)] - l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
@@ -72,7 +72,7 @@ impl LidDrivenCavity {
 
                 for i in 1..self.nx - 1 {
                     let l = &links[ix(i, j, n)];
-                    diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                    diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
                     ax[i] = l.a_w;
                     cx[i] = l.a_e;
                     rhs[i] = -l.a_n * x[ix(i, j + 1, n)] - l.a_s * x[ix(i, j - 1, n)]
@@ -86,7 +86,7 @@ impl LidDrivenCavity {
                 let i = self.nx - 1;
 
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
                 ax[i] = l.a_w;
                 rhs[i] =
                     -l.a_n * x[ix(i, j + 1, n)] - l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
@@ -102,7 +102,7 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
             cx[i] = l.a_e;
             rhs[i] = -l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
             rhs[i] += -l.a_e * x[ix(i + 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -112,7 +112,7 @@ impl LidDrivenCavity {
 
             for i in 1..self.nx - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
                 ax[i] = l.a_w;
                 cx[i] = l.a_e;
                 rhs[i] = -l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
@@ -126,7 +126,7 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[i] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[i] = (1.0 + damping) * a_0[ix(i, j, n)];
             ax[i] = l.a_w;
             rhs[i] = -l.a_s * x[ix(i, j - 1, n)] + sources[ix(i, j, n)];
             rhs[i] += -l.a_w * x[ix(i - 1, j, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -142,7 +142,7 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
             cx[j] = l.a_n;
             rhs[j] = -l.a_e * x[ix(i + 1, j, n)] + sources[ix(i, j, n)];
             rhs[j] += -l.a_n * x[ix(i, j + 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -152,7 +152,7 @@ impl LidDrivenCavity {
 
             for j in 1..self.ny - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
                 ax[j] = l.a_s;
                 cx[j] = l.a_n;
                 rhs[j] = -l.a_e * x[ix(i + 1, j, n)] + sources[ix(i, j, n)];
@@ -166,7 +166,7 @@ impl LidDrivenCavity {
             let i = 0;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
             ax[j] = l.a_s;
             rhs[j] = -l.a_e * x[ix(i + 1, j, n)] + sources[ix(i, j, n)];
             rhs[j] += -l.a_s * x[ix(i, j - 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -181,7 +181,7 @@ impl LidDrivenCavity {
                 let j = 0;
 
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
                 cx[j] = l.a_n;
                 rhs[j] =
                     -l.a_e * x[ix(i + 1, j, n)] - l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
@@ -191,7 +191,7 @@ impl LidDrivenCavity {
 
                 for j in 1..self.ny - 1 {
                     let l = &links[ix(i, j, n)];
-                    diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                    diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
                     ax[j] = l.a_s;
                     cx[j] = l.a_n;
                     rhs[j] = -l.a_e * x[ix(i + 1, j, n)] - l.a_w * x[ix(i - 1, j, n)]
@@ -204,7 +204,7 @@ impl LidDrivenCavity {
                 //Top wall
                 let j = self.ny - 1;
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
                 ax[j] = l.a_s;
                 rhs[j] =
                     -l.a_e * x[ix(i + 1, j, n)] - l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
@@ -220,7 +220,7 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
             cx[j] = l.a_n;
             rhs[j] = -l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
             rhs[j] += -l.a_n * x[ix(i, j + 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];
@@ -230,7 +230,7 @@ impl LidDrivenCavity {
 
             for j in 1..self.ny - 1 {
                 let l = &links[ix(i, j, n)];
-                diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+                diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
                 ax[j] = l.a_s;
                 cx[j] = l.a_n;
                 rhs[j] = -l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
@@ -244,7 +244,7 @@ impl LidDrivenCavity {
             let i = self.nx - 1;
 
             let l = &links[ix(i, j, n)];
-            diagonal[j] = (1.0 + dumping) * a_0[ix(i, j, n)];
+            diagonal[j] = (1.0 + damping) * a_0[ix(i, j, n)];
             ax[j] = l.a_s;
             rhs[j] = -l.a_w * x[ix(i - 1, j, n)] + sources[ix(i, j, n)];
             rhs[j] += -l.a_s * x[ix(i, j - 1, n)] - a_0[ix(i, j, n)] * x[ix(i, j, n)];

@@ -227,9 +227,7 @@ impl PipeFlow {
 
 #[inline(always)]
 fn replace_row(row: usize, x: &mut [f64], solx: &[f64], nx: usize) {
-    for i in 0..nx {
-        x[ix(0, row, nx)..ix(nx, row, nx)].copy_from_slice(&solx[0..nx]);
-    }
+    x[ix(0, row, nx)..ix(nx, row, nx)].copy_from_slice(&solx[0..nx]);
 }
 
 #[inline(always)]

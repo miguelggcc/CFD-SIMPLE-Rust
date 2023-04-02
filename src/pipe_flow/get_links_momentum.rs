@@ -6,10 +6,10 @@ impl PipeFlow {
     pub fn get_links_momentum(&mut self) {
         let n = self.nx;
 
-        let d_e = self.nu * self.dx / (self.dy);
-        let d_w = self.nu * self.dx / (self.dy);
-        let d_n = self.nu * self.dy / (self.dx);
-        let d_s = self.nu * self.dy / (self.dx);
+        let d_e = self.nu * self.dy / (self.dx);
+        let d_w = self.nu * self.dy / (self.dx);
+        let d_n = self.nu * self.dx / (self.dy);
+        let d_s = self.nu * self.dx / (self.dy);
 
         //Interior cells
         for j in 1..self.ny - 1 {
@@ -95,7 +95,7 @@ impl PipeFlow {
             self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
             let s_x =
-                (0.5 * (self.p[ix(i - 1, j, n)] + self.p[ix(i, j, n)]) - self.p_out) * self.dy; //(pe+p0)/2-pe
+                (0.5 * (self.p[ix(i - 1, j, n)] + self.p[ix(i, j, n)]) - self.p_out) * self.dy;
             let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
             self.source_x[ix(i, j, n)] = s_x;
@@ -237,7 +237,7 @@ impl PipeFlow {
 
         self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-        let s_x = 0.5 * (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
+        let s_x = (0.5 * (self.p[ix(i - 1, j, n)] + self.p[ix(i, j, n)]) - self.p_out) * self.dy;
         let s_y = 0.5 * (self.p[ix(i, j - 1, n)] - self.p[ix(i, j, n)]) * self.dx;
 
         self.source_x[ix(i, j, n)] = s_x;
@@ -264,7 +264,7 @@ impl PipeFlow {
 
         self.links[ix(i, j, n)].set_links(a_e, a_w, a_n, a_s);
 
-        let s_x = 0.5 * (-self.p[ix(i, j, n)] + self.p[ix(i - 1, j, n)]) * self.dy;
+        let s_x = (0.5 * (self.p[ix(i - 1, j, n)] + self.p[ix(i, j, n)]) - self.p_out) * self.dy;
         let s_y = 0.5 * (self.p[ix(i, j, n)] - self.p[ix(i, j + 1, n)]) * self.dx;
 
         self.source_x[ix(i, j, n)] = s_x;

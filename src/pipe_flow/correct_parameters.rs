@@ -109,7 +109,6 @@ impl PipeFlow {
             let f = self.faces.get_mut(ix(i, j, n)).unwrap();
 
             f.u_e = self.u[ix(i, j, n)];
-
             f.u_w +=
                 self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] - self.pc[ix(i, j, n)]) * self.dy
                     / (1.0 / a_0 + 1.0 / a_0w);

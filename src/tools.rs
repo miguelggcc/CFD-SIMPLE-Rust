@@ -27,3 +27,23 @@ pub fn tridiagonal_solver(a: &[f64], b: &[f64], c: &mut [f64], d: &mut [f64], n_
         d[i] -= c[i] * d[i + 1];
     }
 }
+
+#[inline(always)]
+pub fn scientific_notation_f64(num: &f64) -> String {
+    let mut num = format!("{:.precision$e}", num, precision = 2);
+
+    let e_loc = match num.find('e') {
+        Some(num) => num,
+        None => return String::from("NaN"),
+    };
+
+    let exp = num.split_off(e_loc);
+
+    let (sign, exp) = if let Some(stripped) = exp.strip_prefix("e-") {
+        ('-', stripped)
+    } else {
+        ('+', &exp[1..])
+    };
+    num.push_str(&format!("e{}{:0>pad$}", sign, exp, pad = 2));
+    num
+}

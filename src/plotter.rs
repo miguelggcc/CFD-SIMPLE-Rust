@@ -24,6 +24,12 @@ impl Env {
     }
 }
 
+impl Default for Env {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct Plot<'p> {
     py: Python<'p>,
     plt: PyModule,
@@ -32,7 +38,7 @@ pub struct Plot<'p> {
 }
 
 impl<'p> Plot<'p> {
-    pub fn new<'a>(env: &'a Env) -> Plot<'a> {
+    pub fn new(env: &'_ Env) -> Plot<'_> {
         let py = env.gil.python();
         let plt = PyModule::import(py, "matplotlib.pyplot").unwrap();
         let np = PyModule::import(py, "numpy").unwrap();
@@ -146,7 +152,7 @@ impl<'p> Plot<'p> {
         let np_v = self.reshape(v, x.len(), y.len());
 
         let dictq = PyDict::new(self.py);
-        dictq.set_item(self.py, "scale", 1 * x.len() / 30).unwrap();
+        dictq.set_item(self.py, "scale", x.len() / 30).unwrap();
 
         let q = self
             .plt
@@ -156,12 +162,12 @@ impl<'p> Plot<'p> {
         self.artists.push(q);
     }
 
-    pub fn streamplot(&mut self, x: &[f64], y: &[f64], u: &[f64], v: &[f64]) {
+    pub fn streamplot(&mut self, x: &[f64], y: &[f64], u: &[f64], v: &[f64], density: f32) {
         let np_u = self.reshape(u, x.len(), y.len());
         let np_v = self.reshape(v, x.len(), y.len());
 
         let dictq = PyDict::new(self.py);
-        dictq.set_item(self.py, "density", 1.0).unwrap();
+        dictq.set_item(self.py, "density", density).unwrap();
         dictq.set_item(self.py, "color", "w").unwrap();
 
         let list = PyList::extract(
@@ -277,66 +283,4 @@ pub struct Animation<'p> {
     np: PyModule,
     writer: PyObject,
     artists: Vec<PyObject>,
-}
-
-impl<'p> Animation<'p> {
-    pub fn new(env: &'p Env, plot: Plot<'p>, fps: u32) -> Animation<'p> {
-        let py = env.gil.python();
-        let plt = PyModule::import(py, "matplotlib.pyplot").unwrap();
-        let np = PyModule::import(py, "numpy").unwrap();
-        let animation = PyModule::import(py, "matplotlib.animation").unwrap();
-        let dict = PyDict::new(py);
-        dict.set_item(py, "fps", fps).unwrap();
-        dict.set_item(py, "extra_args", vec!["-vcodec", "h264_nvenc"])
-            .unwrap();
-        let writer = animation
-            .call(py, "FFMpegWriter", NoArgs, Some(&dict))
-            .unwrap();
-        let artists = Vec::default();
-        Self {
-            py,
-            plot,
-            plt,
-            np,
-            writer,
-            artists,
-        }
-    }
-
-    pub fn setup_animation(&self, filename: &str) {
-        let fig = self.plt.call(self.py, "gcf", NoArgs, None).unwrap();
-        self.writer
-            .call_method(self.py, "setup", (fig, filename), None)
-            .unwrap();
-    }
-
-    pub fn update_frame(&self, z: &[f64], _u: &[f64], _v: &[f64], x_len: usize, y_len: usize) {
-        let np_z = self.reshape(z, x_len, y_len);
-        self.artists[0]
-            .call_method(self.py, "set_data", (&np_z,), None)
-            .unwrap();
-
-        self.writer
-            .call_method(self.py, "grab_frame", NoArgs, None)
-            .unwrap();
-    }
-
-    pub fn finish_animation(&self) {
-        self.writer
-            .call_method(self.py, "finish", NoArgs, None)
-            .unwrap();
-    }
-
-    pub fn clf(&self) {
-        let _ = self
-            .plt
-            .call(self.py, "clf", PyTuple::empty(self.py), None)
-            .unwrap();
-    }
-
-    pub fn reshape(&self, values: &[f64], a: usize, b: usize) -> PyObject {
-        self.np
-            .call(self.py, "reshape", (values, (a, b)), None)
-            .unwrap()
-    }
 }

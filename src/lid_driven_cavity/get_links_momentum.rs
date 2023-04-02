@@ -6,10 +6,10 @@ impl LidDrivenCavity {
     pub fn get_links_momentum(&mut self) {
         let n = self.nx;
 
-        let d_e = self.nu * self.dx / (self.dy);
-        let d_w = self.nu * self.dx / (self.dy);
-        let d_n = self.nu * self.dy / (self.dx);
-        let d_s = self.nu * self.dy / (self.dx);
+        let d_e = self.nu * self.dy / (self.dx);
+        let d_w = self.nu * self.dy / (self.dx);
+        let d_n = self.nu * self.dx / (self.dy);
+        let d_s = self.nu * self.dx / (self.dy);
 
         //Interior cells
         for j in 1..self.ny - 1 {

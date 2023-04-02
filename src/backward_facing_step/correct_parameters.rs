@@ -56,7 +56,7 @@ impl BackwardFacingStep {
             let a_0 = self.a_0[ix(i, j, n)];
             self.u[ix(i, j, n)] +=
                 self.relax_uv * 0.5 * (self.pc[ix(i - 1, j, n)] + self.pc[ix(i, j, n)]) * self.dy
-                    / a_0; //(pw+p0)/2 - p0
+                    / a_0;
         }
         //------------------v velocity----------------------
 
