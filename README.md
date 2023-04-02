@@ -33,7 +33,7 @@ $$
 u = 0,\ v = 0 \quad \text{at} \quad x = 0,\ x = 1,\ y = 0
 $$
 
-To validate the results of the lid-driven cavity flow solver, we compare them with the experimental results of Ghia et al. [^1] for Reynolds number 100.
+To validate the results of the lid-driven cavity flow solver, we compare them with the experimental data of Ghia et al. [^1] for Reynolds number 100.
 
 ### Results
 <p align="middle">
