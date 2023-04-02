@@ -4,7 +4,7 @@ This project is a computational fluid dynamics (CFD) solver written in Rust and 
 
 ## Usage
 
-To run this project, you need to have Rust and Python 3 installed on your system. To run the solver for a specific case, use the following command:
+To run this project, you need to have Rust, Python 3 and matplotlib installed on your system. To run the solver for a specific case, use the following command:
 
 ```bash
 cargo run --release -- -c <case>
