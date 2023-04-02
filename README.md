@@ -109,11 +109,11 @@ p = p_{out} \quad \text{at} \quad x = L
 $$
 
 $$
-u = 0,\ v = 0 \quad \text{at} \quad y = 0,\ 0 < x < L_1
+u = 0,\ v = 0 \quad \text{at} \quad y = H_1,\ 0 < x < L_1
 $$
 
 $$
-u = 0,\ v = 0 \quad \text{at} \quad y = H_1,\ L_1 < x < L
+u = 0,\ v = 0 \quad \text{at} \quad y = 0,\ L_1 < x < L
 $$
 
 where $U_{in}$ is the inlet velocity, $p_{out}$ is the outlet pressure, $L$ is the length of the domain, $H$ is the height of the domain, $L_1$ is the length of the step, and $H_1$ is the height of the step.
