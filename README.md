@@ -161,7 +161,27 @@ The solver uses a uniform mesh of size $N_x \times N_y$, where $N_x$ and $N_y$ a
 The solver implements the same SIMPLE algorithm with a collocated mesh as the lid-driven cavity flow.
 
 The solver outputs the velocity and pressure fields at each time step in CSV files in the `output` folder. The solver also prints the residuals and the Courant number at each time step.
+Sure, I'll write something about that. Here is a possible paragraph to add to the readme:
 
+## Validation
+
+To validate the results of the pipe flow solver, we compare them with the analytical solution of the Poiseuille flow, which is a special case of the pipe flow with no-slip boundary conditions at the top and bottom walls. The analytical solution for the velocity profile and the pressure drop are given by:
+
+$$
+u(y) = \frac{1}{2 \mu} \frac{dp}{dx} (H^2/4 - y^2) \\
+\Delta p = -\frac{8 \mu U_{in} L}{H^2}
+$$
+
+where $\mu$ is the dynamic viscosity, $dp/dx$ is the pressure gradient, $H$ is the height of the domain, $U_{in}$ is the inlet velocity, and $L$ is the length of the domain.
+
+We plot the numerical and analytical solutions for the velocity profile at $x = L/2$ and the pressure drop along the domain. The figures show a good agreement between the numerical and analytical solutions, confirming the accuracy of the solver.
+
+![Pipe flow velocity validation](images/pipe_velocity_validation.png)
+![Pipe flow pressure validation](images/pipe_pressure_validation.png)
+
+Origen: Conversación con Bing, 2/4/2023(1) Exact analytical solutions for the Poiseuille and Couette–Poiseuille .... https://www.sciencedirect.com/science/article/pii/S1007570411004059 Con acceso 2/4/2023.
+(2) Analytical solution of the poiseuille flow problem using the .... https://link.springer.com/article/10.1134/S0021894412040050 Con acceso 2/4/2023.
+(3) A full analytical solution for the force-driven compressible Poiseuille .... https://aip.scitation.org/doi/10.1063/1.3540671 Con acceso 2/4/2023.
 Alright, I'll continue the readme:
 
 ## Backward facing step flow
