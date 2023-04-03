@@ -37,12 +37,16 @@ To validate the results of the lid-driven cavity flow solver, we compare them wi
 
 ### Results
 <p align="middle">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229377769-c678d206-57b4-490d-be1c-7f23985b3fe1.png" width="500">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229377781-3fa8f610-eff3-400a-87e2-779cc5ab3fd9.png" width="350">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229572745-e5539738-8548-4ee7-b361-dd14d4a2f6f6.svg" width="500">
 </p>
+
 <p align="middle">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229377785-288878e7-f831-412a-93c9-298fc458671d.png" width="350">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229377966-760cac88-bfd7-4ad6-bcd7-805a0f285b8f.png" width="500">
+  <img align="middle" src="https://user-images.githubusercontent.com/100235899/229572848-ae0dfb31-bba6-4213-946a-8d057cdc63ed.png" width="350">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229575038-2325a136-3db4-4299-8077-b4d000d56beb.png" width="350">
+</p>
+
+<p align="middle">
+<img align="https://user-images.githubusercontent.com/100235899/229577368-4ebd63e8-e309-4532-98c1-153a4a526b33.svg" width="500">
 </p>
 
 ## Pipe flow
@@ -85,14 +89,16 @@ where $\mu$ is the dynamic viscosity, $dp/dx$ is the pressure gradient and $h$ i
 
 ### Results
 <p align="middle">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229377925-5450b28c-307b-47d7-b3f2-a725b53f1ac1.png" width="600">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229377933-2c9f70ce-9328-4034-9a8f-3bc24ec8a405.png" width="350">
-</p>
-<p align="middle">
-<img src="https://user-images.githubusercontent.com/100235899/229377937-ba8cd109-ecf9-4162-8769-348b3c6cca2c.png" width="350">
-<img src="https://user-images.githubusercontent.com/100235899/229377941-23c1eab2-6f6e-462b-a57f-28bcc33967c4.png" width="350">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229579428-475ffa16-94d3-4bdc-b140-e5ba93208390.svg" width="600">
 </p>
 
+<p align="middle">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229579602-a5f8a843-045f-4cac-9579-357d01c08411.png" width="350">
+</p>
+<p align="middle">
+<img src="https://user-images.githubusercontent.com/100235899/229579766-89d5a017-5a71-4f8a-9c67-bd528c9deb30.png" width="300">
+  <img src="https://user-images.githubusercontent.com/100235899/229579879-6502113e-1383-43f5-b324-3ad52f101653.png" width="300">
+</p>
 
 ## Backward facing step flow
 
@@ -126,16 +132,20 @@ $$
 
 ### Results
 <p align="middle">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229378653-89ebd29d-b123-46a6-a00d-f7837e24ad50.png" width="600">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229378657-5a16376b-d7bf-41fb-a7a9-a8ea1ff8f2e8.png" width="350">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229580299-3055ac31-2814-4780-bf93-ffd870637793.svg" width="600">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229580400-548a8f22-5c1f-4587-a21f-4e17eb22419d.png" width="350">
 </p>
+
 <p align="middle">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229378063-14a6db9d-a107-4109-83c6-11c89d138332.png" width="600">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229378087-fa05128d-50a4-43b5-ab9c-b22608cf1952.png" width="350">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229580687-e8275574-fe76-4b39-8a07-b0ac8f850795.svg" width="600">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229580775-a3bdc81b-dc04-4a9f-8a57-e0677f95aeb2.png" width="350">
 </p>
+
 <p align="middle">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229378559-de2ab640-d964-4823-8383-461a96f2b825.png" width="600">
-<img align="middle" src="https://user-images.githubusercontent.com/100235899/229378566-af9966fd-57dc-4f04-a281-2cd263b05ec1.png" width="350">
+
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229581044-676f548b-bd6e-45b0-b599-34760fb8aeb1.svg" width="600">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229581111-4ebc922b-cb16-4d4d-838d-b40cc115de32.png" width="350">
 </p>
+
 
 [^1]: U. Ghia, K. N. Ghia, and C. T. Shin, "High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method," Journal of Computational Physics, vol. 48, no. 3, pp. 387-411, 1982.
