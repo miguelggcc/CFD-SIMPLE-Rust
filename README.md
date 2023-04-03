@@ -46,7 +46,7 @@ To validate the results of the lid-driven cavity flow solver, we compare them wi
 </p>
 
 <p align="middle">
-<img align="https://user-images.githubusercontent.com/100235899/229577368-4ebd63e8-e309-4532-98c1-153a4a526b33.svg" width="500">
+<img align="middle" src="https://user-images.githubusercontent.com/100235899/229581475-6d71f5e5-3aff-48f5-9972-73cfc3be70cd.svg" width="500">
 </p>
 
 ## Pipe flow
