@@ -7,8 +7,6 @@ mod residuals;
 mod solver;
 mod solver_correction;
 
-use itertools_num::linspace;
-
 use crate::Case;
 
 use self::{face_velocity::Faces, residuals::Residuals};
@@ -24,8 +22,8 @@ pub struct LidDrivenCavity {
     pub relax_uv: f64,
     pub relax_p: f64,
     pub damping: f64,
-    pub x: Vec<f64>,
-    pub y: Vec<f64>,
+    pub width: f64,
+    pub height: f64,
     pub links: Vec<Links>,
     pub plinks: Vec<Links>,
     pub source_x: Vec<f64>,
@@ -43,10 +41,11 @@ pub struct LidDrivenCavity {
 
 impl LidDrivenCavity {
     pub fn new(nx: usize, ny: usize, re: f64, relax_uv: f64, relax_p: f64, damping: f64) -> Self {
-        let dx = 1.0 / (nx as f64);
-        let dy = 1.0 / (ny as f64);
-        let x = linspace::<f64>(0.0, 1.0, nx).collect();
-        let y = linspace::<f64>(0.0, 1.0, ny).collect();
+        let width = 1.0;
+        let height = 1.0;
+        let dx = width / (nx as f64);
+        let dy = height / (ny as f64);
+
         let u = vec![0.0; ny * nx];
 
         let v = vec![0.0; ny * nx];
@@ -75,8 +74,8 @@ impl LidDrivenCavity {
             relax_uv,
             relax_p,
             damping,
-            x,
-            y,
+            width,
+            height,
             links,
             plinks,
             source_x,
@@ -95,7 +94,6 @@ impl Case for LidDrivenCavity {
     fn iterate(&mut self) {
         self.get_links_momentum();
 
-        self.save_u_residual();
         let mut u = std::mem::take(&mut self.u);
         self.solver_correction(
             &mut u,
@@ -106,8 +104,8 @@ impl Case for LidDrivenCavity {
             self.damping,
         );
         self.u = u;
+        self.save_u_residual();
 
-        self.save_v_residual();
         let mut v = std::mem::take(&mut self.v);
         self.solver_correction(
             &mut v,
@@ -118,15 +116,15 @@ impl Case for LidDrivenCavity {
             self.damping,
         );
         self.v = v;
+        self.save_v_residual();
 
         self.get_face_velocities();
         self.get_links_pressure_correction();
 
-        self.save_pressure_residual();
-        
         let mut pc = vec![0.0; self.ny * self.nx];
         self.solver(&mut pc, &self.a_p0, &self.plinks, &self.source_p, 20);
         self.pc = pc;
+        self.save_pressure_residual();
 
         self.correct_cell_velocities();
         self.correct_face_velocities();

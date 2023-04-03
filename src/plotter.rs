@@ -64,6 +64,22 @@ impl<'p> Plot<'p> {
         let _ = self.plt.call(self.py, "show", NoArgs, None).unwrap();
     }
 
+    pub fn size(&self, sizex: f32, sizey: f32) {
+        let dict = PyDict::new(self.py);
+        dict.set_item(self.py, "figsize", (sizex, sizey)).unwrap();
+        self.plt
+            .call(self.py, "figure", NoArgs, Some(&dict))
+            .unwrap();
+    }
+
+    pub fn dpi(&self, dpi: f32) {
+        let dict = PyDict::new(self.py);
+        dict.set_item(self.py, "dpi", dpi).unwrap();
+        self.plt
+            .call(self.py, "figure", NoArgs, Some(&dict))
+            .unwrap();
+    }
+
     pub fn imshow(&self, values: PyObject, cmap: &str, interpolation: &str) {
         let dict = PyDict::new(self.py);
         dict.set_item(self.py, "cmap", cmap).unwrap();
@@ -93,6 +109,11 @@ impl<'p> Plot<'p> {
     pub fn plot(&self, x: &[f64], y: &[f64]) {
         assert!(x.len() == y.len());
         let _ = self.plt.call(self.py, "plot", (x, y), None).unwrap();
+    }
+
+    pub fn plot_color(&self, x: &[f64], y: &[f64], color: &str) {
+        assert!(x.len() == y.len());
+        let _ = self.plt.call(self.py, "plot", (x, y, color), None).unwrap();
     }
 
     pub fn semilogx(&self, x: &[f64], y: &[f64]) {
@@ -137,7 +158,7 @@ impl<'p> Plot<'p> {
 
         let dict2 = PyDict::new(self.py);
         dict2.set_item(self.py, "ax", ax).unwrap();
-        dict2.set_item(self.py, "fraction", 0.046).unwrap();
+        dict2.set_item(self.py, "fraction", 0.016).unwrap();
         dict2.set_item(self.py, "pad", 0.04).unwrap();
         fig.call_method(self.py, "tight_layout", NoArgs, None)
             .unwrap();

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::plotter::Plot;
+use crate::{plotter::Plot, tools::vector_delta};
 
 use super::PipeFlow;
 
@@ -9,6 +9,11 @@ impl PipeFlow {
         let export_path = Path::new("./results_pipe_flow/");
         std::fs::create_dir_all(export_path).expect("Error creating path");
 
+        let x_centers = vector_delta(self.dx * 0.5, self.dx, self.nx);
+        let y_centers = vector_delta(self.dy * 0.5, self.dy, self.ny);
+        let x = vector_delta(0.0, self.width / (self.nx - 1) as f64, self.nx);
+        let y = vector_delta(0.0, self.height / (self.ny - 1) as f64, self.ny);
+
         plot.clf();
         let vel: Vec<f64> = self
             .u
@@ -16,50 +21,73 @@ impl PipeFlow {
             .zip(&self.v)
             .map(|(u, v)| (u * u + v * v).sqrt())
             .collect();
-        plot.contourf(&self.x, &self.y, &vel, "plasma", &format!("Velocity magnitude (Re = {:.0})", self.re));
-        plot.streamplot(&self.x, &self.y, &self.u, &self.v, 1.0);
+        plot.contourf(
+            &x,
+            &y,
+            &vel,
+            "plasma",
+            &format!("Velocity magnitude (Re = {:.0})", self.re),
+        );
+        plot.streamplot(&x, &y, &self.u, &self.v, 1.0);
         plot.xlabel("x");
         plot.ylabel("y");
-        plot.save(export_path.join("velocity_m.png"));
+        plot.save(export_path.join("velocity_m.svg"));
         plot.clf();
 
-        plot.contourf(&self.x, &self.y, &self.u, "jet",&format!("u velocity (Re = {:.0})", self.re));
+        plot.pcolormesh(
+            &x,
+            &y,
+            &self.u,
+            "jet",
+            &format!("u velocity (Re = {:.0})", self.re),
+        );
         plot.xlabel("x");
         plot.ylabel("y");
-        plot.save(export_path.join("u.png"));
+        plot.save(export_path.join("u.svg"));
         plot.clf();
 
-        plot.contourf(&self.x, &self.y, &self.v, "jet", &format!("v velocity (Re = {:.0})", self.re));
+        plot.contourf(
+            &x,
+            &y,
+            &self.v,
+            "jet",
+            &format!("v velocity (Re = {:.0})", self.re),
+        );
         plot.xlabel("x");
         plot.ylabel("y");
         plot.save(export_path.join("v.png"));
         plot.clf();
 
-        plot.contourf(&self.x, &self.y, &self.p, "jet", &format!("Pressure (Re = {:.0})", self.re));
+        plot.contourf(
+            &x,
+            &y,
+            &self.p,
+            "jet",
+            &format!("Pressure (Re = {:.0})", self.re),
+        );
         plot.xlabel("x");
         plot.ylabel("y");
         plot.save(export_path.join("p.png"));
         plot.clf();
 
-        let h = 0.5;
-        let x_end = 5.0;
+        let h = self.height*0.5;
 
-        //Get u profile at nx-10 and compare it to  analytical solution
+        //Get u profile at nx-10 and compare it to analytical solution
         let mut u_profile = vec![];
         for j in 0..self.ny {
             u_profile.push(self.u[self.nx - 10 + j * self.nx]);
         }
 
-        let u_profile_analytical: Vec<f64> = self
-            .y
+        let u_profile_analytical: Vec<f64> = y
             .iter()
             .map(|y| 1.5 * self.u_in * (1.0 - (y - h).powi(2) / (h * h)))
             .collect();
 
-        let x_profile = self.x[self.nx - 10];
+        let x_profile = x_centers[self.nx - 10];
 
-        plot.plot(&u_profile, &self.y);
-        plot.plot(&u_profile_analytical, &self.y);
+        plot.dpi(150.0);
+        plot.plot(&u_profile, &y_centers);
+        plot.plot_color(&u_profile_analytical, &y, "m--");
         plot.grid(true);
         plot.xlabel("u");
         plot.ylabel("y");
@@ -76,14 +104,13 @@ impl PipeFlow {
             p_drop.push(self.p[i + self.ny / 2 * self.nx]);
         }
 
-        let p_drop_analytical: Vec<f64> = self
-            .x
+        let p_drop_analytical: Vec<f64> = x
             .iter()
-            .map(|x| (-3.0 * self.nu * self.rho / (h * h) * self.u_in) * (x - x_end))
+            .map(|x| (-3.0 * self.nu * self.rho / (h * h) * self.u_in) * (x - self.width))
             .collect();
 
-        plot.plot(&self.x, &p_drop);
-        plot.plot(&self.x, &p_drop_analytical);
+        plot.plot(&x_centers, &p_drop);
+        plot.plot_color(&x, &p_drop_analytical, "m--");
         plot.grid(true);
         plot.xlabel("x");
         plot.ylabel("p");

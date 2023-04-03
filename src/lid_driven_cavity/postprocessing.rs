@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::plotter::Plot;
+use crate::{plotter::Plot, tools::vector_delta};
 
 use super::LidDrivenCavity;
 
@@ -9,6 +9,11 @@ impl LidDrivenCavity {
         let export_path = Path::new("./results_lid_driven_cavity/");
         std::fs::create_dir_all(export_path).expect("Error creating path");
 
+        let x_centers = vector_delta(self.dx * 0.5, self.dx, self.nx);
+        let y_centers = vector_delta(self.dy * 0.5, self.dy, self.ny);
+        let x = vector_delta(0.0, self.width / (self.nx - 1) as f64, self.nx);
+        let y = vector_delta(0.0, self.height / (self.ny - 1) as f64, self.ny);
+
         plot.clf();
         let vel: Vec<f64> = self
             .u
@@ -16,28 +21,52 @@ impl LidDrivenCavity {
             .zip(&self.v)
             .map(|(u, v)| (u * u + v * v).sqrt())
             .collect();
-        plot.contourf(&self.x, &self.y, &vel, "plasma", &format!("Velocity magnitude (Re = {:.0})", self.re));
-        plot.streamplot(&self.x, &self.y, &self.u, &self.v, 3.0);
+        plot.pcolormesh(
+            &x,
+            &y,
+            &vel,
+            "plasma",
+            &format!("Velocity magnitude (Re = {:.0})", self.re),
+        );
+        plot.streamplot(&x, &y, &self.u, &self.v, 3.0);
         plot.xlabel("x");
         plot.ylabel("y");
-        plot.save(export_path.join("velocity_m.png"));
+        plot.save(export_path.join("velocity_m.svg"));
         plot.clf();
 
         plot.clf();
 
-        plot.contourf(&self.x, &self.y, &self.u, "jet", &format!("u velocity (Re = {:.0})", self.re));
+        plot.contourf(
+            &x,
+            &y,
+            &self.u,
+            "jet",
+            &format!("u velocity (Re = {:.0})", self.re),
+        );
         plot.xlabel("x");
         plot.ylabel("y");
         plot.save(export_path.join("u.png"));
         plot.clf();
 
-        plot.contourf(&self.x, &self.y, &self.v, "jet", &format!("v velocity (Re = {:.0})", self.re));
+        plot.contourf(
+            &x,
+            &y,
+            &self.v,
+            "jet",
+            &format!("v velocity (Re = {:.0})", self.re),
+        );
         plot.xlabel("x");
         plot.ylabel("y");
         plot.save(export_path.join("v.png"));
         plot.clf();
 
-        plot.contourf(&self.x, &self.y, &self.p, "jet", &format!("Pressure (Re = {:.0})", self.re));
+        plot.contourf(
+            &x,
+            &y,
+            &self.p,
+            "jet",
+            &format!("Pressure (Re = {:.0})", self.re),
+        );
         plot.xlabel("x");
         plot.ylabel("y");
         plot.save(export_path.join("p.png"));
@@ -71,10 +100,10 @@ impl LidDrivenCavity {
         for i in 0..self.nx {
             ghia_v_solution.push(self.v[i + self.ny / 2 * self.nx]);
         }
-
-        plot.plot(&self.y, &ghia_u_solution);
+        plot.dpi(150.0);
+        plot.plot(&y_centers, &ghia_u_solution);
         plot.scatter(&ghia_y, &ghia_u);
-        plot.plot(&self.x, &ghia_v_solution);
+        plot.plot(&x_centers, &ghia_v_solution);
         plot.scatter(&ghia_x, &ghia_v);
         plot.grid(true);
         plot.legend(&[

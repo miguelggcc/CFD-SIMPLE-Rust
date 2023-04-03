@@ -47,3 +47,12 @@ pub fn scientific_notation_f64(num: &f64) -> String {
     num.push_str(&format!("e{}{:0>pad$}", sign, exp, pad = 2));
     num
 }
+
+#[inline(always)]
+pub fn vector_delta(start: f64, delta: f64, n: usize) -> Vec<f64> {
+    let mut v = Vec::with_capacity(n);
+    for i in 0..n {
+        v.push(start + delta * i as f64);
+    }
+    v
+}

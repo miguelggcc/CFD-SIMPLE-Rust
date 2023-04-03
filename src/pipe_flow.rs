@@ -7,8 +7,6 @@ mod residuals;
 mod solver;
 mod solver_correction;
 
-use itertools_num::linspace;
-
 use crate::Case;
 
 use self::{face_velocity::Faces, residuals::Residuals};
@@ -26,8 +24,8 @@ pub struct PipeFlow {
     pub relax_uv: f64,
     pub relax_p: f64,
     pub damping: f64,
-    pub x: Vec<f64>,
-    pub y: Vec<f64>,
+    pub width: f64,
+    pub height: f64,
     pub links: Vec<Links>,
     pub plinks: Vec<Links>,
     pub source_x: Vec<f64>,
@@ -45,22 +43,22 @@ pub struct PipeFlow {
 
 impl PipeFlow {
     pub fn new(nx: usize, ny: usize, re: f64, relax_uv: f64, relax_p: f64, damping: f64) -> Self {
+        let width = 5.0;
+        let height = 1.0;
         let u_in = 1.0;
         let p_out = 0.0;
-        let dx = 5.0 / (nx as f64);
-        let dy = 1.0 / (ny as f64);
-        let x = linspace::<f64>(0.0, 5.0, nx).collect();
-        let y = linspace::<f64>(0.0, 1.0, ny).collect();
-        let u = vec![u_in; ny *nx];
-        let v = vec![0.0; ny *nx];
-        let p = vec![0.0; ny *nx];
-        let pc = vec![0.0; ny *nx];
-        let links = vec![Links::default(); ny *nx];
+        let dx = width / (nx as f64);
+        let dy = height / (ny as f64);
+        let u = vec![u_in; ny * nx];
+        let v = vec![0.0; ny * nx];
+        let p = vec![0.0; ny * nx];
+        let pc = vec![0.0; ny * nx];
+        let links = vec![Links::default(); ny * nx];
         let plinks = links.clone();
-        let source_x = vec![0.0; ny *nx];
+        let source_x = vec![0.0; ny * nx];
         let source_y = source_x.clone();
         let source_p = source_x.clone();
-        let a_0 = vec![0.0; ny *nx];
+        let a_0 = vec![0.0; ny * nx];
         let a_p0 = a_0.clone();
         let faces = vec![Faces::default(); ny * nx];
         let residuals = Residuals::default();
@@ -80,8 +78,8 @@ impl PipeFlow {
             relax_uv,
             relax_p,
             damping,
-            x,
-            y,
+            width,
+            height,
             links,
             plinks,
             source_x,
