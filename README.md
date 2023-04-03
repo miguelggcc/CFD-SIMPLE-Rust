@@ -1,6 +1,6 @@
 # SIMPLE algorithm based CFD solver in Rust
 
-This project is a computational fluid dynamics (CFD) solver written in Rust and post-processed with matplotlib, using the SIMPLE algorithm with a collocated grid to integrate the 2D incompressible steady Navier-Stokes equations. This project is based on the [lectures by Dr. Sandip Mazumder](https://youtube.com/playlist?list=PLVuuXJfoPgT4gJcBAAFPW7uMwjFKB9aqT). It can solve three cases: the lid-driven cavity flow, the pipe flow with a velocity inlet and a gauge pressure outlet, and the backward facing step flow.
+This project is a computational fluid dynamics (CFD) solver written in Rust and post-processed with matplotlib, using the SIMPLE algorithm with a collocated grid to integrate the 2D incompressible steady Navier-Stokes equations. This project is based on the [lectures by Dr. Sandip Mazumder](https://youtube.com/playlist?list=PLVuuXJfoPgT4gJcBAAFPW7uMwjFKB9aqT). It can solve three cases: the lid-driven cavity flow, the pipe flow with a velocity inlet/gauge pressure outlet, and the backward facing step flow.
 
 ## Usage
 
@@ -17,8 +17,11 @@ where `<case>` can be one of `lid_driven_cavity`, `pipe_flow`, `backward_facing_
 The lid-driven cavity flow is a classic benchmark problem for CFD. It consists of a square domain with all the boundaries being solid walls. The top wall moves in the x-direction at a constant speed while the other walls are stationary. The flow is governed by the incompressible Navier-Stokes equations:
 
 $$
-\nabla \cdot \mathbf{u} = 0 \\
-\frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\frac{1}{\rho} \nabla p + \nu \nabla^2 \mathbf{u}
+\nabla \cdot \mathbf{u} = 0
+&&
+
+&&
+(\mathbf{u} \cdot \nabla) \mathbf{u} = -\frac{1}{\rho} \nabla p + \nu \nabla^2 \mathbf{u}
 $$
 
 where $\mathbf{u} = (u,v)$ is the velocity vector, $p$ is the pressure, $\rho$ is the density, and $\nu$ is the kinematic viscosity.
@@ -75,17 +78,17 @@ $$
 Re = \frac{U_{in} H}{\nu}
 $$
 
-To validate the results of the pipe flow solver, we compare them with the analytical solution of the Poiseuille flow, which is a special case of the pipe flow with no-slip boundary conditions at the top and bottom walls. The analytical solution for the velocity profile and the pressure drop are given by:
+To validate the results of the pipe flow solver, they're compared with the analytical solution of the Poiseuille flow, in which the u velocity profile and the pressure drop are given by:
 
 $$
 u(y) = 1.5 U_{in}(1-y^2/h^2)
 $$
 
 $$
-\frac{dp}{dx} = -3 \frac{\mu}{h^2}U_{in}
+\frac{\partial p}{\partial x} = -3 \frac{\mu}{h^2}U_{in}
 $$
 
-where $\mu$ is the dynamic viscosity, $dp/dx$ is the pressure gradient and $h$ is $H/2$. The figures show a good agreement between the numerical and analytical solutions, confirming the accuracy of the solver.
+where $\mu$ is the viscosity and $h$ is $H/2$. The figures show a good agreement between the numerical and analytical solutions, confirming the accuracy of the solver.
 
 ### Results
 <p align="middle">
@@ -124,10 +127,10 @@ $$
 
 where $U_{in}$ is the inlet velocity, $p_{out}$ is the outlet pressure, $L$ is the length of the domain, $H$ is the height of the domain, $L_1$ is the length of the step, and $H_1$ is the height of the step.
 
-The Reynolds number based on the inlet velocity and the step height is defined as:
+The Reynolds number based on the inlet velocity and the total height is defined as:
 
 $$
-Re = \frac{U_{in} H_1}{\nu}
+Re = \frac{U_{in} H}{\nu}
 $$
 
 ### Results
