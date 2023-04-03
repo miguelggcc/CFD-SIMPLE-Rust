@@ -18,9 +18,9 @@ The lid-driven cavity flow is a classic benchmark problem for CFD. It consists o
 
 $$
 \nabla \cdot \mathbf{u} = 0
-&&
+$$
 
-&&
+$$
 (\mathbf{u} \cdot \nabla) \mathbf{u} = -\frac{1}{\rho} \nabla p + \nu \nabla^2 \mathbf{u}
 $$
 
