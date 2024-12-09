@@ -1,6 +1,6 @@
 # SIMPLE algorithm based CFD solver in Rust
 
-This project is a computational fluid dynamics (CFD) solver written in Rust and post-processed with matplotlib, using the SIMPLE algorithm with a collocated grid to integrate the 2D incompressible steady Navier-Stokes equations. This project is based on the [lectures by Dr. Sandip Mazumder](https://youtube.com/playlist?list=PLVuuXJfoPgT4gJcBAAFPW7uMwjFKB9aqT). It can solve three cases: the lid-driven cavity flow, the pipe flow with a velocity inlet/gauge pressure outlet, and the backward facing step flow.
+This project is a computational fluid dynamics (CFD) solver written in Rust and post-processed with matplotlib, using the SIMPLE algorithm with a collocated grid to integrate the 2D incompressible steady Navier-Stokes equations. This project is based on the [lectures by Dr. Sandip Mazumder](https://youtube.com/playlist?list=PLVuuXJfoPgT4gJcBAAFPW7uMwjFKB9aqT). It can solve three cases: lid-driven cavity flow, pipe flow with a velocity inlet/gauge pressure outlet, and backward facing step flow.
 
 ## Usage
 
@@ -36,7 +36,7 @@ $$
 u = 0,\ v = 0 \quad \text{at} \quad x = 0,\ x = 1,\ y = 0
 $$
 
-To validate the results of the lid-driven cavity flow solver, we compare them with the experimental data of Ghia et al. [^1] for Reynolds number 100.
+To validate the results of the lid-driven cavity flow solver, they're compared with the experimental data of Ghia et al. [^1] for Reynolds number 100.
 
 ### Results
 <p align="middle">
