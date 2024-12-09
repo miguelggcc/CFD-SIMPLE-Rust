@@ -88,7 +88,7 @@ $$
 \frac{\partial p}{\partial x} = -3 \frac{\mu}{h^2}U_{in}
 $$
 
-where $\mu$ is the viscosity and $h$ is $H/2$. The figures show a good agreement between the numerical and analytical solutions, confirming the accuracy of the solver.
+where $\mu$ is the viscosity and $h$ is $H/2$. The figures show a good agreement between the numerical and analytical solutions.
 
 ### Results
 <p align="middle">
@@ -152,3 +152,6 @@ $$
 
 
 [^1]: U. Ghia, K. N. Ghia, and C. T. Shin, "High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method," Journal of Computational Physics, vol. 48, no. 3, pp. 387-411, 1982.
+
+## License
+This project is licensed under the MIT License.
